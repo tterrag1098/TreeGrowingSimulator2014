@@ -52,10 +52,8 @@ public class TickHandlerTGS implements ITickHandler{
 						if (TreeSimulator.showParticles)
 							sendPacket(pos[0], pos[1], pos[2], player.worldObj, basePlayer);
 						
-						System.out.println("bonemeal event at: " + event.X + " " + event.Y + " " + event.Z + " status:" + event.getResult());
 						movementCounter = 0;
 					}
-					System.out.println("moved!");
 				}
 			}
 			else
