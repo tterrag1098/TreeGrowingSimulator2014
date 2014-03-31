@@ -16,7 +16,6 @@ public class TickHandlerTGS implements ITickHandler{
 	private double posX = 0, posZ = 0;
 	private int movementCounter = 0;
 	private int ticksSinceLastCheck = 0;
-	private final int WAIT_TIME = 150;
 	
 	@Override
 	public void tickStart(EnumSet<TickType> type, Object... tickData) 
@@ -29,7 +28,7 @@ public class TickHandlerTGS implements ITickHandler{
 				if (Math.abs(player.posX - posX) > 0.25 || Math.abs(player.posZ - posZ) > 0.25)
 				{
 					movementCounter++;
-					if (movementCounter > WAIT_TIME)
+					if (movementCounter > TreeSimulator.instance.waitTime)
 					{
 						int[] pos = getNearestSapling(player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
 
