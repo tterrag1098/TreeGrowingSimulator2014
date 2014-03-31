@@ -1,0 +1,24 @@
+*.class
+
+# Package Files #
+*.war
+*.ear
+/build
+/eclipse
+/bin
+
+*.mtl
+*.classpath
+*.project
+/.settings
+/.gradle
+/config
+!/src/main/resources
+/crash-reports
+/logs
+/mods
+/resourcepacks
+/saves
+/screenshots
+/options.txt
+/libs
