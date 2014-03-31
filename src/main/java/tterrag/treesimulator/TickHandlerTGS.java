@@ -33,7 +33,7 @@ public class TickHandlerTGS implements ITickHandler{
 				if (Math.abs(player.posX - posX) > 0.25 || Math.abs(player.posZ - posZ) > 0.25)
 				{
 					movementCounter++;
-					if (movementCounter > TreeSimulator.instance.waitTime)
+					if (movementCounter > TreeSimulator.waitTime)
 					{
 						int[] pos = getNearestSapling(player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
 
@@ -48,7 +48,9 @@ public class TickHandlerTGS implements ITickHandler{
 						MinecraftForge.EVENT_BUS.post(event);
 
 						((BlockSapling)Block.blocksList[player.worldObj.getBlockId(pos[0], pos[1], pos[2])]).markOrGrowMarked(player.worldObj, pos[0], pos[1], pos[2], player.worldObj.rand);
-						sendPacket(pos[0], pos[1], pos[2], player.worldObj, basePlayer);
+						
+						if (TreeSimulator.showParticles)
+							sendPacket(pos[0], pos[1], pos[2], player.worldObj, basePlayer);
 						
 						System.out.println("bonemeal event at: " + event.X + " " + event.Y + " " + event.Z + " status:" + event.getResult());
 						movementCounter = 0;

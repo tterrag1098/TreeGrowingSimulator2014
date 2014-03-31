@@ -16,7 +16,8 @@ import cpw.mods.fml.relauncher.Side;
 @NetworkMod(serverSideRequired=true, clientSideRequired=false, channels = {TreeSimulator.CHANNEL}, packetHandler = PacketHandlerTGS.class)
 public class TreeSimulator {
 
-	public int waitTime;
+	public static int waitTime;
+	public static boolean showParticles;
 	public static final String CHANNEL = "TGS2014";
 	
 	@Instance
@@ -41,6 +42,7 @@ public class TreeSimulator {
 		config.load();
 		
 		waitTime = config.get("Tweaks", "waitTime", 150, "The amount of ticks (times 5) you must be sprinting before bonemeal is applied").getInt();
+		showParticles = config.get("Tweaks", "showParticles", true, "Show bonemeal particles when appropriate. Not sure why you would turn this off, but eh").getBoolean(true);
 		
 		config.save();
 	}
