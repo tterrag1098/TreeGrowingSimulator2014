@@ -8,13 +8,16 @@ import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 
 @Mod(modid = "treeGrowingSimulator", version = "0.0.1", name = "Tree Growing Simulator 2014")
+@NetworkMod(serverSideRequired=true, clientSideRequired=false, channels = {TreeSimulator.CHANNEL}, packetHandler = PacketHandlerTGS.class)
 public class TreeSimulator {
 
 	public int waitTime;
+	public static final String CHANNEL = "TGS2014";
 	
 	@Instance
 	public static TreeSimulator instance;
@@ -37,7 +40,7 @@ public class TreeSimulator {
 		
 		config.load();
 		
-		waitTime = config.get("Tweaks", "waitTime", 150, "The amount of ticks you must be sprinting before bonemeal is applied").getInt();
+		waitTime = config.get("Tweaks", "waitTime", 150, "The amount of ticks (times 5) you must be sprinting before bonemeal is applied").getInt();
 		
 		config.save();
 	}

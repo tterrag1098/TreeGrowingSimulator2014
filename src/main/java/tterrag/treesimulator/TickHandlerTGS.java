@@ -1,15 +1,19 @@
 package tterrag.treesimulator;
 
+import java.util.Arrays;
 import java.util.EnumSet;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.BonemealEvent;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.common.network.PacketDispatcher;
+import cpw.mods.fml.common.network.Player;
 
 public class TickHandlerTGS implements ITickHandler{
 
@@ -23,6 +27,7 @@ public class TickHandlerTGS implements ITickHandler{
 		if (type.contains(TickType.PLAYER))
 		{
 			EntityPlayer player = (EntityPlayer) tickData[0];
+			Player basePlayer = (Player) tickData[0];
 			if (ticksSinceLastCheck >= 5)
 			{
 				if (Math.abs(player.posX - posX) > 0.25 || Math.abs(player.posZ - posZ) > 0.25)
@@ -43,7 +48,8 @@ public class TickHandlerTGS implements ITickHandler{
 						MinecraftForge.EVENT_BUS.post(event);
 
 						((BlockSapling)Block.blocksList[player.worldObj.getBlockId(pos[0], pos[1], pos[2])]).markOrGrowMarked(player.worldObj, pos[0], pos[1], pos[2], player.worldObj.rand);
-
+						sendPacket(pos[0], pos[1], pos[2], player.worldObj, basePlayer);
+						
 						System.out.println("bonemeal event at: " + event.X + " " + event.Y + " " + event.Z + " status:" + event.getResult());
 						movementCounter = 0;
 					}
@@ -59,6 +65,37 @@ public class TickHandlerTGS implements ITickHandler{
 		}
 	}
 	
+	private void sendPacket(int x, int y, int z, World worldObj, Player player) 
+	{
+
+		Packet250CustomPayload packet = new Packet250CustomPayload();
+
+		packet.channel = TreeSimulator.CHANNEL;
+		packet.length = 12;
+
+		byte[] bytes = new byte[12];
+
+		bytes[0] = (byte) (x & 255);
+		bytes[1] = (byte) ((x >> 8) & 255);
+		bytes[2] = (byte) ((x >> 16) & 255);
+		bytes[3] = (byte) ((x >> 24) & 255);
+		
+		bytes[4] = (byte) (y & 255);
+		bytes[5] = (byte) ((y >> 8) & 255);
+		bytes[6] = (byte) ((y >> 16) & 255);
+		bytes[7] = (byte) ((y >> 24) & 255);
+		
+		bytes[8] = (byte) (z & 255);
+		bytes[9] = (byte) ((z >> 8) & 255);
+		bytes[10] = (byte) ((z >> 16) & 255);
+		bytes[11] = (byte) ((z >> 24) & 255);
+		
+		System.out.println(x + " " + y + " " + z + " " + Arrays.toString(bytes));
+		
+		packet.data = bytes;
+		PacketDispatcher.sendPacketToPlayer(packet, player);
+	}
+
 	private void updatePlayerPos(EntityPlayer player)
 	{
 		posX = player.posX;
