@@ -18,7 +18,7 @@ public class MicListener implements ITickHandler {
 	private TargetDataLine line;
 	private byte[] buffer;
 	private int bufferOffset;
-	public int bufferSizeMultiplier = 1;
+	public double bufferSizeMultiplier = 0.125;
 	private boolean isRunning = false;
 	
 	public void init()
@@ -36,7 +36,7 @@ public class MicListener implements ITickHandler {
 		    return;
 		}
 		line.start();
-		buffer = new byte[line.getBufferSize() * bufferSizeMultiplier];
+		buffer = new byte[(int) (line.getBufferSize() * bufferSizeMultiplier)];
 		bufferOffset = 0;
 		isRunning = true;
 	}
@@ -66,7 +66,7 @@ public class MicListener implements ITickHandler {
 			int remaining = buffer.length-bufferOffset;
 			int bytesRead = line.read(buffer, bufferOffset, Math.min(remaining, available));
 			bufferOffset += bytesRead;
-			if (bytesRead < available) {
+			if (bytesRead <= available) {
 				// buffer is full, analyze data
 				bufferOffset = 0;
 				int sum = 0;
