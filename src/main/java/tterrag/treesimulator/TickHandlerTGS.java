@@ -39,7 +39,6 @@ public class TickHandlerTGS implements ITickHandler {
 			Player basePlayer = (Player) tickData[0];
 			if (ticksSinceLastCheck >= 5)
 			{
-				System.out.println(state + " " + player.isSneaking() + " " + movementCounter);
 				if (Math.abs(player.posX - posX) > 0.25 || Math.abs(player.posZ - posZ) > 0.25)
 				{
 					movementCounter++;
@@ -47,7 +46,6 @@ public class TickHandlerTGS implements ITickHandler {
 				if (PlayerState.getState(player.isSneaking()) != state)
 				{					
 					movementCounter++;
-					System.out.println("dancing!");
 				}
 				if (movementCounter > TreeSimulator.waitTime)
 				{
@@ -63,8 +61,8 @@ public class TickHandlerTGS implements ITickHandler {
 					BonemealEvent event = new BonemealEvent(player, player.worldObj, player.worldObj.getBlockId(pos[0], pos[1], pos[2]), pos[0], pos[1], pos[2]);
 					MinecraftForge.EVENT_BUS.post(event);
 
-	                if ((double)player.worldObj.rand.nextFloat() < 0.45D)
-	                	((BlockSapling)Block.blocksList[player.worldObj.getBlockId(pos[0], pos[1], pos[2])]).markOrGrowMarked(player.worldObj, pos[0], pos[1], pos[2], player.worldObj.rand);
+	        			 if ((double)player.worldObj.rand.nextFloat() < 0.45D)
+	                			((BlockSapling)Block.blocksList[player.worldObj.getBlockId(pos[0], pos[1], pos[2])]).markOrGrowMarked(player.worldObj, pos[0], pos[1], pos[2], player.worldObj.rand);
 					
 					if (TreeSimulator.showParticles)
 						sendPacket(pos[0], pos[1], pos[2], player.worldObj, basePlayer);
