@@ -81,10 +81,21 @@ public class TreeGrower {
 		}
 	}
 	
-	public static void requestTreeGrowthClient() {
+	public static void requestTreeGrowthClient(double rms) {
 		Packet250CustomPayload packet = new Packet250CustomPayload();
 		packet.channel = TreeSimulator.CHANNEL;
-		packet.length = 0;
+		ByteArrayOutputStream byteStream = new ByteArrayOutputStream(12);
+		DataOutputStream stream = new DataOutputStream(byteStream);
+		try {
+			stream.writeDouble(rms);
+			stream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
+
+		packet.data = byteStream.toByteArray();
+		packet.length = byteStream.size();
 		PacketDispatcher.sendPacketToServer(packet);
 	}
 }

@@ -19,7 +19,18 @@ public class PacketHandlerTGS implements IPacketHandler{
 		if (player instanceof EntityPlayerMP) {
 			// server side, "request growth" packet
 			if (TreeSimulator.yellingWorks) {
-				TreeGrower.instance.requestTreeGrowth((EntityPlayerMP)player);
+				ByteArrayInputStream byteStream = new ByteArrayInputStream(packet.data);
+				DataInputStream stream = new DataInputStream(byteStream);
+				double rms;
+				try {
+					rms = stream.readDouble();
+				} catch (IOException e) {
+					e.printStackTrace();
+					return;
+				}
+				if (rms > TreeSimulator.loudnessThreshold) {
+					TreeGrower.instance.requestTreeGrowth((EntityPlayerMP)player);
+				}
 			}
 		}
 		else {

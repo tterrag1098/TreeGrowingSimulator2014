@@ -18,7 +18,7 @@ public class MicListener implements ITickHandler {
 	private TargetDataLine line;
 	private byte[] buffer;
 	private int bufferOffset;
-	public int bufferSizeMultiplier = 2;
+	public int bufferSizeMultiplier = 1;
 	private boolean isRunning = false;
 	
 	public void init()
@@ -81,10 +81,7 @@ public class MicListener implements ITickHandler {
 		 
 		        double averageMeanSquare = sumMeanSquare / buffer.length;
 		        double rms = Math.pow(averageMeanSquare,0.5d) + 0.5;
-		        if (rms > TreeSimulator.loudnessThreshold) {
-		        	System.out.println("Client requested tree growth");
-		        	TreeGrower.instance.requestTreeGrowthClient();
-		        }
+	        	TreeGrower.instance.requestTreeGrowthClient(rms);
 			}
 		}
 	}
