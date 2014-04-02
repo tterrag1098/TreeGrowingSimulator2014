@@ -43,11 +43,11 @@ public class TickHandlerTGS implements ITickHandler {
 			{
 				if ((Math.abs(player.posX - posX) > 0.25 || Math.abs(player.posZ - posZ) > 0.25) && TreeSimulator.sprintingWorks)
 				{
-					TreeGrower.requestTreeGrowth((EntityPlayerMP)tickData[0]);
+					TreeGrower.instance.requestTreeGrowth((EntityPlayerMP)tickData[0]);
 				}
 				if ((PlayerState.getState(player.isSneaking()) != state) && TreeSimulator.crouchingWorks)
 				{					
-					TreeGrower.requestTreeGrowth((EntityPlayerMP)tickData[0]);
+					TreeGrower.instance.requestTreeGrowth((EntityPlayerMP)tickData[0]);
 				}
 			}
 			else

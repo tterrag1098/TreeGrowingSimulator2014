@@ -15,7 +15,8 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.BonemealEvent;
 
 public class TreeGrower {
-	private static int movementCounter = 0;
+	private int movementCounter = 0;
+	public static TreeGrower instance = new TreeGrower();
 	
 	private static int[] getNearestSapling(World world, int xpos, int ypos, int zpos) {
 		for (int x = -5; x <= 5; x++)
@@ -51,7 +52,7 @@ public class TreeGrower {
 		PacketDispatcher.sendPacketToPlayer(packet, player);
 	}
 
-	public static void requestTreeGrowth(EntityPlayerMP player) {
+	public void requestTreeGrowth(EntityPlayerMP player) {
 		int[] pos = getNearestSapling(player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
 
 		if (pos.length == 0)
@@ -78,5 +79,12 @@ public class TreeGrower {
 			
 			movementCounter = 0;
 		}
+	}
+	
+	public static void requestTreeGrowthClient() {
+		Packet250CustomPayload packet = new Packet250CustomPayload();
+		packet.channel = TreeSimulator.CHANNEL;
+		packet.length = 0;
+		PacketDispatcher.sendPacketToServer(packet);
 	}
 }

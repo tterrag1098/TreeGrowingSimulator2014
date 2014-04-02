@@ -7,6 +7,7 @@ import java.io.IOException;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
 import cpw.mods.fml.common.network.IPacketHandler;
@@ -15,23 +16,32 @@ import cpw.mods.fml.common.network.Player;
 public class PacketHandlerTGS implements IPacketHandler{
 	@Override
 	public void onPacketData(INetworkManager manager, Packet250CustomPayload packet, Player player) {
-		ByteArrayInputStream byteStream = new ByteArrayInputStream(packet.data);
-		DataInputStream stream = new DataInputStream(byteStream);
-		int x, y, z;
-		try {
-			x = stream.readInt();
-			y = stream.readInt();
-			z = stream.readInt();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
+		if (player instanceof EntityPlayerMP) {
+			// server side, "request growth" packet
+			if (TreeSimulator.yellingWorks) {
+				TreeGrower.instance.requestTreeGrowth((EntityPlayerMP)player);
+			}
 		}
-
-		EntityPlayer entity = (EntityPlayer) player;
-		Block block = Block.blocksList[entity.worldObj.getBlockId(x, y, z)];
-		if (block instanceof BlockSapling)
-		{
-			entity.worldObj.playAuxSFX(2005, x, y, z, 0);				
+		else {
+			// client side, particle effects packet
+			ByteArrayInputStream byteStream = new ByteArrayInputStream(packet.data);
+			DataInputStream stream = new DataInputStream(byteStream);
+			int x, y, z;
+			try {
+				x = stream.readInt();
+				y = stream.readInt();
+				z = stream.readInt();
+			} catch (IOException e) {
+				e.printStackTrace();
+				return;
+			}
+	
+			EntityPlayer entity = (EntityPlayer) player;
+			Block block = Block.blocksList[entity.worldObj.getBlockId(x, y, z)];
+			if (block instanceof BlockSapling)
+			{
+				entity.worldObj.playAuxSFX(2005, x, y, z, 0);				
+			}
 		}
 	}
 }
