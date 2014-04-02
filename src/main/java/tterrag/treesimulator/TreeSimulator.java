@@ -41,7 +41,7 @@ public class TreeSimulator {
 		
 		config.load();
 		
-		waitTime = config.get("Tweaks", "waitTime", 150, "The amount of ticks (times 5) you must be sprinting before bonemeal is applied").getInt();
+		waitTime = config.get("Tweaks", "waitTime", 100, "The amount of ticks (times 5) you must be sprinting before bonemeal is applied").getInt();
 		showParticles = config.get("Tweaks", "showParticles", true, "Show bonemeal particles when appropriate. Not sure why you would turn this off, but eh").getBoolean(true);
 		
 		config.save();
