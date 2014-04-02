@@ -41,7 +41,6 @@ public class TickHandlerTGS implements ITickHandler {
 			{
 				int[] pos = getNearestSapling(player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
 
-				System.out.println(movementCounter);
 				if (pos.length == 0)
 					return;
 				
