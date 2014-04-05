@@ -1,9 +1,5 @@
 package tterrag.treesimulator;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,6 +10,7 @@ import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.Player;
 
 public class PacketHandlerTGS implements IPacketHandler{
+
 	@Override
 	public void onPacketData(INetworkManager manager, Packet250CustomPayload packet, Player player) {
 		if (player instanceof EntityPlayerMP) {
@@ -35,23 +32,20 @@ public class PacketHandlerTGS implements IPacketHandler{
 		}
 		else {
 			// client side, particle effects packet
-			ByteArrayInputStream byteStream = new ByteArrayInputStream(packet.data);
-			DataInputStream stream = new DataInputStream(byteStream);
-			int x, y, z;
-			try {
-				x = stream.readInt();
-				y = stream.readInt();
-				z = stream.readInt();
-			} catch (IOException e) {
-				e.printStackTrace();
-				return;
-			}
-	
-			EntityPlayer entity = (EntityPlayer) player;
-			Block block = Block.blocksList[entity.worldObj.getBlockId(x, y, z)];
-			if (block instanceof BlockSapling)
+			if (packet.data.length == 12)
 			{
-				entity.worldObj.playAuxSFX(2005, x, y, z, 0);				
+				byte[] bytes = packet.data;
+			
+				int x = ((bytes[0] & 255) | ((bytes[1] & 255) << 8) | ((bytes[2] & 255) << 16) | (bytes[3] & 255) << 24);
+				int y = ((bytes[4] & 255) | ((bytes[5] & 255) << 8) | ((bytes[6] & 255) << 16) | (bytes[7] & 255) << 24);
+				int z = ((bytes[8] & 255) | ((bytes[9] & 255) << 8) | ((bytes[10] & 255) << 16) | (bytes[11] & 255) << 24);
+
+				EntityPlayer entity = (EntityPlayer) player;
+				Block block = Block.blocksList[entity.worldObj.getBlockId(x, y, z)];
+				if (block instanceof BlockSapling)
+				{
+					entity.worldObj.playAuxSFX(2005, x, y, z, 0);				
+				}
 			}
 		}
 	}

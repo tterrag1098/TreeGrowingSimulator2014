@@ -21,8 +21,6 @@ public class TreeSimulator {
 
 	public static int waitTime;
 	public static boolean showParticles;
-	public static boolean crouchingWorks;
-	public static boolean sprintingWorks;
 	public static boolean yellingWorks;
 	public static double loudnessThreshold;
 	public static final String CHANNEL = "TGS2014";
@@ -56,8 +54,6 @@ public class TreeSimulator {
 		
 		waitTime = config.get("Tweaks", "waitTime", 100, "The amount of ticks (times 5) you must be sprinting before bonemeal is applied").getInt();
 		showParticles = config.get("Tweaks", "showParticles", true, "Show bonemeal particles when appropriate. Not sure why you would turn this off, but eh").getBoolean(true);
-		crouchingWorks = config.get("Tweaks", "crouchingWorks", true, "Enable crouching to speed growth").getBoolean(true);
-		sprintingWorks = config.get("Tweaks", "sprintingWorks", true, "Enable sprinting to speed growth").getBoolean(true);
 		yellingWorks = config.get("Tweaks", "yellingWorks", true, "Enable talking to speed growth").getBoolean(true);
 		loudnessThreshold = config.get("Tweaks", "loudnessThreshold", 60.0, "What is considered to be the loudness of talking").getDouble(60.0);
 		

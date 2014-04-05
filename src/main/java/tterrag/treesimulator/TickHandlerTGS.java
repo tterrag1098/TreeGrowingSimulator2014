@@ -1,8 +1,5 @@
 package tterrag.treesimulator;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.EnumSet;
 
@@ -47,11 +44,11 @@ public class TickHandlerTGS implements ITickHandler {
 				if (pos.length == 0)
 					return;
 				
-				if ((Math.abs(player.posX - posX) > 0.25 || Math.abs(player.posZ - posZ) > 0.25) && TreeSimulator.sprintingWorks)
+				if (Math.abs(player.posX - posX) > 0.25 || Math.abs(player.posZ - posZ) > 0.25)
 				{
 					movementCounter++;
 				}
-				if ((PlayerState.getState(player.isSneaking()) != state) && TreeSimulator.crouchingWorks)
+				if (PlayerState.getState(player.isSneaking()) != state)
 				{					
 					movementCounter++;
 				}
@@ -91,21 +88,29 @@ public class TickHandlerTGS implements ITickHandler {
 		Packet250CustomPayload packet = new Packet250CustomPayload();
 
 		packet.channel = TreeSimulator.CHANNEL;
+		packet.length = 12;
 
-		ByteArrayOutputStream byteStream = new ByteArrayOutputStream(12);
-		DataOutputStream stream = new DataOutputStream(byteStream);
-		try {
-			stream.writeInt(x);
-			stream.writeInt(y);
-			stream.writeInt(z);
-			stream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
+		byte[] bytes = new byte[12];
 
-		packet.data = byteStream.toByteArray();
-		packet.length = byteStream.size();
+		bytes[0] = (byte) (x & 255);
+		bytes[1] = (byte) ((x >> 8) & 255);
+		bytes[2] = (byte) ((x >> 16) & 255);
+		bytes[3] = (byte) ((x >> 24) & 255);
+
+		bytes[4] = (byte) (y & 255);
+		bytes[5] = (byte) ((y >> 8) & 255);
+		bytes[6] = (byte) ((y >> 16) & 255);
+		bytes[7] = (byte) ((y >> 24) & 255);
+
+		bytes[8] = (byte) (z & 255);
+		bytes[9] = (byte) ((z >> 8) & 255);
+		bytes[10] = (byte) ((z >> 16) & 255);
+		bytes[11] = (byte) ((z >> 24) & 255);
+
+		System.out
+				.println(x + " " + y + " " + z + " " + Arrays.toString(bytes));
+
+		packet.data = bytes;
 		PacketDispatcher.sendPacketToPlayer(packet, player);
 	}
 
