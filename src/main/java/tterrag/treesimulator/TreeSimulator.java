@@ -24,6 +24,7 @@ public class TreeSimulator {
 	public static boolean yellingWorks;
 	public static double loudnessThreshold;
 	public static final String CHANNEL = "TGS2014";
+	public static TickHandlerTGS tickHandler;
 	
 	@SideOnly(Side.CLIENT)
 	public MicListener micListener;
@@ -40,7 +41,8 @@ public class TreeSimulator {
 	@EventHandler
 	public void init(FMLInitializationEvent event)
 	{
-		TickRegistry.registerTickHandler(new TickHandlerTGS(), Side.SERVER);
+		tickHandler = new TickHandlerTGS();
+		TickRegistry.registerTickHandler(tickHandler, Side.SERVER);
 		if (event.getSide() == Side.CLIENT && yellingWorks) {
 			micListener = new MicListener();
 		}

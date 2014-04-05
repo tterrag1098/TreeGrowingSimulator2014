@@ -1,5 +1,8 @@
 package tterrag.treesimulator;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.EnumSet;
 
 import javax.sound.sampled.AudioFormat;
@@ -8,8 +11,10 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
 
+import net.minecraft.network.packet.Packet250CustomPayload;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -81,7 +86,22 @@ public class MicListener implements ITickHandler {
 		 
 		        double averageMeanSquare = sumMeanSquare / buffer.length;
 		        double rms = Math.pow(averageMeanSquare,0.5d) + 0.5;
-	        	TreeGrower.instance.requestTreeGrowthClient(rms);
+		        
+				Packet250CustomPayload packet = new Packet250CustomPayload();
+				packet.channel = TreeSimulator.CHANNEL;
+				ByteArrayOutputStream byteStream = new ByteArrayOutputStream(12);
+				DataOutputStream stream = new DataOutputStream(byteStream);
+				try {
+					stream.writeDouble(rms);
+					stream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+					return;
+				}
+
+				packet.data = byteStream.toByteArray();
+				packet.length = byteStream.size();
+				PacketDispatcher.sendPacketToServer(packet);
 			}
 		}
 	}
