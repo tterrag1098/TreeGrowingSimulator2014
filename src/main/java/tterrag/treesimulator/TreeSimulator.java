@@ -45,6 +45,8 @@ public class TreeSimulator {
 		TickRegistry.registerTickHandler(tickHandler, Side.SERVER);
 		if (event.getSide() == Side.CLIENT && yellingWorks) {
 			micListener = new MicListener();
+			micListener.init();
+			TickRegistry.registerTickHandler(micListener, Side.CLIENT);
 		}
 	}
 	
@@ -60,22 +62,5 @@ public class TreeSimulator {
 		loudnessThreshold = config.get("Tweaks", "loudnessThreshold", 60.0, "What is considered to be the loudness of talking").getDouble(60.0);
 		
 		config.save();
-	}
-	
-	@EventHandler
-	public void gameStarted(FMLServerStartedEvent e) {
-		if (e.getSide() == Side.CLIENT && yellingWorks)
-		{
-			micListener.init();
-			TickRegistry.registerTickHandler(micListener, Side.CLIENT);
-		}
-	}
-
-	@EventHandler
-	public void gameStopping(FMLServerStoppingEvent e) {
-		if (e.getSide() == Side.CLIENT && yellingWorks)
-		{
-			micListener.shutdown();
-		}
 	}
 }
