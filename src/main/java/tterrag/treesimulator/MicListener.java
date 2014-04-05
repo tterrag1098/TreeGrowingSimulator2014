@@ -11,6 +11,7 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.packet.Packet250CustomPayload;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.TickType;
@@ -65,7 +66,7 @@ public class MicListener implements ITickHandler {
 
 	@Override
 	public void tickStart(EnumSet<TickType> type, Object... tickData) {
-		if (isRunning)
+		if (isRunning && Minecraft.getMinecraft().inGameHasFocus)
 		{
 			int available = line.available();
 			int remaining = buffer.length-bufferOffset;

@@ -17,7 +17,6 @@ import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.Player;
 
 public class PacketHandlerTGS implements IPacketHandler{
-
 	@Override
 	public void onPacketData(INetworkManager manager, Packet250CustomPayload packet, Player p) {
 		if (p instanceof EntityPlayerMP) {
@@ -42,20 +41,12 @@ public class PacketHandlerTGS implements IPacketHandler{
 						if (pos.length == 0)
 							return;
 						
-						if (Math.abs(player.posX - TreeSimulator.tickHandler.posX) > 0.25 || Math.abs(player.posZ - TreeSimulator.tickHandler.posZ) > 0.25)
-						{
-							TreeSimulator.tickHandler.movementCounter++;
-						}
-						if (PlayerState.getState(player.isSneaking()) != TreeSimulator.tickHandler.state)
-						{					
-							TreeSimulator.tickHandler.movementCounter++;
-						}
+						TreeSimulator.tickHandler.movementCounter++;
 						if (TreeSimulator.tickHandler.movementCounter > TreeSimulator.waitTime)
 						{
 							if (pos.length == 0) 
 							{
 								TreeSimulator.tickHandler.movementCounter--;
-								TreeSimulator.tickHandler.updatePlayerPos(player);
 								return;
 							}
 
@@ -75,9 +66,6 @@ public class PacketHandlerTGS implements IPacketHandler{
 					{
 						TreeSimulator.tickHandler.ticksSinceLastCheck++;
 					}
-					
-					TreeSimulator.tickHandler.state = PlayerState.getState(player.isSneaking());
-					TreeSimulator.tickHandler.updatePlayerPos(player);
 				}
 			}
 		}
