@@ -33,6 +33,7 @@ public class TreeSimulator {
 	public void init(FMLInitializationEvent event)
 	{
 <<<<<<< HEAD
+<<<<<<< HEAD
 		TickRegistry.registerTickHandler(new TickHandlerTGS(), Side.SERVER);
 =======
 		tickHandler = new TickHandlerTGS();
@@ -41,6 +42,9 @@ public class TreeSimulator {
 			micListener = new MicListener();
 		}
 >>>>>>> parent of 5194366... Merge pull request #2 from impiaaa/master
+=======
+		TickRegistry.registerTickHandler(new TickHandlerTGS(), Side.SERVER);
+>>>>>>> parent of e5bfa06... Merge pull request #1 from impiaaa/master
 	}
 	
 	private void initConfig(File file)
@@ -53,22 +57,5 @@ public class TreeSimulator {
 		showParticles = config.get("Tweaks", "showParticles", true, "Show bonemeal particles when appropriate. Not sure why you would turn this off, but eh").getBoolean(true);
 		
 		config.save();
-	}
-	
-	@EventHandler
-	public void gameStarted(FMLServerStartedEvent e) {
-		if (e.getSide() == Side.CLIENT && yellingWorks)
-		{
-			micListener.init();
-			TickRegistry.registerTickHandler(micListener, Side.CLIENT);
-		}
-	}
-
-	@EventHandler
-	public void gameStopping(FMLServerStoppingEvent e) {
-		if (e.getSide() == Side.CLIENT && yellingWorks)
-		{
-			micListener.shutdown();
-		}
 	}
 }
