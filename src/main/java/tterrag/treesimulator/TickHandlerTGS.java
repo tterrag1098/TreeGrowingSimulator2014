@@ -18,9 +18,9 @@ import static tterrag.treesimulator.TickHandlerTGS.PlayerState.*;
 
 public class TickHandlerTGS implements ITickHandler {
 
-	private double posX = 0, posZ = 0;
-	private int movementCounter = 0;
-	private int ticksSinceLastCheck = 0;
+	public double posX = 0, posZ = 0;
+	public int movementCounter = 0;
+	public int ticksSinceLastCheck = 0;
 
 	public enum PlayerState {
 		CROUCHED, STANDING;
@@ -28,7 +28,7 @@ public class TickHandlerTGS implements ITickHandler {
 		public static PlayerState getState(boolean bool){ return bool ? CROUCHED : STANDING; };
 	};
 
-	private PlayerState state = STANDING;
+	public PlayerState state = STANDING;
 
 	@Override
 	public void tickStart(EnumSet<TickType> type, Object... tickData) 
@@ -85,7 +85,7 @@ public class TickHandlerTGS implements ITickHandler {
 		}
 	}
 
-	private void sendPacket(int x, int y, int z, World worldObj, Player player) {
+	public void sendPacket(int x, int y, int z, World worldObj, Player player) {
 
 		Packet250CustomPayload packet = new Packet250CustomPayload();
 
@@ -116,12 +116,12 @@ public class TickHandlerTGS implements ITickHandler {
 		PacketDispatcher.sendPacketToPlayer(packet, player);
 	}
 
-	private void updatePlayerPos(EntityPlayer player) {
+	public void updatePlayerPos(EntityPlayer player) {
 		posX = player.posX;
 		posZ = player.posZ;
 	}
 
-	private int[] getNearestSapling(World world, int xpos, int ypos, int zpos) {
+	public int[] getNearestSapling(World world, int xpos, int ypos, int zpos) {
 		for (int x = -5; x <= 5; x++)
 			for (int y = -2; y <= 2; y++)
 				for (int z = -5; z <= 5; z++) {
