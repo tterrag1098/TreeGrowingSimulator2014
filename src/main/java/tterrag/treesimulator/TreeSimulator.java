@@ -32,19 +32,7 @@ public class TreeSimulator {
 	@EventHandler
 	public void init(FMLInitializationEvent event)
 	{
-<<<<<<< HEAD
-<<<<<<< HEAD
 		TickRegistry.registerTickHandler(new TickHandlerTGS(), Side.SERVER);
-=======
-		tickHandler = new TickHandlerTGS();
-		TickRegistry.registerTickHandler(tickHandler, Side.SERVER);
-		if (event.getSide() == Side.CLIENT && yellingWorks) {
-			micListener = new MicListener();
-		}
->>>>>>> parent of 5194366... Merge pull request #2 from impiaaa/master
-=======
-		TickRegistry.registerTickHandler(new TickHandlerTGS(), Side.SERVER);
->>>>>>> parent of e5bfa06... Merge pull request #1 from impiaaa/master
 	}
 	
 	private void initConfig(File file)

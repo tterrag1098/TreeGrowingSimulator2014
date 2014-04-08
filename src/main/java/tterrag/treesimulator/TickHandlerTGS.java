@@ -63,11 +63,13 @@ public class TickHandlerTGS implements ITickHandler {
 
 					BonemealEvent event = new BonemealEvent(player, player.worldObj, player.worldObj.getBlockId(pos[0], pos[1], pos[2]), pos[0], pos[1], pos[2]);
 					MinecraftForge.EVENT_BUS.post(event);
+					
+					BlockSapling sapling = (BlockSapling) Block.blocksList[player.worldObj.getBlockId(pos[0], pos[1], pos[2])]; 
 
 	        		if ((double)player.worldObj.rand.nextFloat() < 0.45D)
-	                	((BlockSapling)Block.blocksList[player.worldObj.getBlockId(pos[0], pos[1], pos[2])]).markOrGrowMarked(player.worldObj, pos[0], pos[1], pos[2], player.worldObj.rand);
+	                	sapling.markOrGrowMarked(player.worldObj, pos[0], pos[1], pos[2], player.worldObj.rand);
 					
-					if (TreeSimulator.showParticles)
+					if (TreeSimulator.showParticles && sapling.blockID == Block.sapling.blockID)
 						sendPacket(pos[0], pos[1], pos[2], player.worldObj, basePlayer);
 					
 					movementCounter = 0;
