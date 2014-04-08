@@ -13,6 +13,15 @@ buildscript {
 
 apply plugin: 'forge'
 
+ext.configFile = file "build.properties"
+
+configFile.withReader {
+    // Load config.  It shall from now be referenced as simply config or project.config
+    def prop = new Properties()
+    prop.load(it)
+    project.ext.config = new ConfigSlurper().parse prop
+}
+
 // Finds and sets version data
 task buildInfo {
     def cmd = "git rev-parse --short HEAD"
@@ -31,13 +40,13 @@ task buildInfo {
 }
 ext.artifact_version = 'NFG'
 if (System.getenv().ARTIFACT_VERSION == null) {
-    artifact_version = "${mod_version}"
+    artifact_version = "${config.mod_version}"
 }
 if (System.getenv().ARTIFACT_VERSION != null) {
     artifact_version = "${system.getenv().ARTIFACT_VERSION}"
 }
 
-version = "MC${minecraft_version}-${artifact_version}-${buildInfo.buildNum}"
+version = "MC${config.minecraft_version}-${artifact_version}-${buildInfo.buildNum}"
 def actualVersion = "${artifact_version}-${buildInfo.buildNum}"
 
 minecraft {
