@@ -16,22 +16,27 @@ import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
 import static tterrag.treesimulator.TickHandlerTGS.PlayerState.*;
 
-public class TickHandlerTGS implements ITickHandler {
+public class TickHandlerTGS implements ITickHandler
+{
 
 	private double posX = 0, posZ = 0;
 	private int movementCounter = 0;
 	private int ticksSinceLastCheck = 0;
 
-	public enum PlayerState {
+	public enum PlayerState
+	{
 		CROUCHED, STANDING;
-		
-		public static PlayerState getState(boolean bool){ return bool ? CROUCHED : STANDING; };
+
+		public static PlayerState getState(boolean bool)
+		{
+			return bool ? CROUCHED : STANDING;
+		};
 	};
 
 	private PlayerState state = STANDING;
 
 	@Override
-	public void tickStart(EnumSet<TickType> type, Object... tickData) 
+	public void tickStart(EnumSet<TickType> type, Object... tickData)
 	{
 		if (type.contains(TickType.PLAYER))
 		{
@@ -43,18 +48,18 @@ public class TickHandlerTGS implements ITickHandler {
 
 				if (pos.length == 0)
 					return;
-				
+
 				if (Math.abs(player.posX - posX) > 0.25 || Math.abs(player.posZ - posZ) > 0.25)
 				{
 					movementCounter++;
 				}
 				if (PlayerState.getState(player.isSneaking()) != state)
-				{					
+				{
 					movementCounter++;
 				}
 				if (movementCounter > TreeSimulator.waitTime)
 				{
-					if (pos.length == 0) 
+					if (pos.length == 0)
 					{
 						movementCounter--;
 						updatePlayerPos(player);
@@ -63,15 +68,18 @@ public class TickHandlerTGS implements ITickHandler {
 
 					BonemealEvent event = new BonemealEvent(player, player.worldObj, player.worldObj.getBlockId(pos[0], pos[1], pos[2]), pos[0], pos[1], pos[2]);
 					MinecraftForge.EVENT_BUS.post(event);
-					
-					BlockSapling sapling = (BlockSapling) Block.blocksList[player.worldObj.getBlockId(pos[0], pos[1], pos[2])]; 
 
-	        		if ((double)player.worldObj.rand.nextFloat() < 0.45D)
-	                	sapling.markOrGrowMarked(player.worldObj, pos[0], pos[1], pos[2], player.worldObj.rand);
-					
-					if (TreeSimulator.showParticles && sapling.blockID == Block.sapling.blockID)
-						sendPacket(pos[0], pos[1], pos[2], player.worldObj, basePlayer);
-					
+					Block block = Block.blocksList[player.worldObj.getBlockId(pos[0], pos[1], pos[2])];
+
+					if (block instanceof BlockSapling)
+					{
+						BlockSapling sapling = (BlockSapling) block;
+						if ((double) player.worldObj.rand.nextFloat() < 0.45D)
+							sapling.markOrGrowMarked(player.worldObj, pos[0], pos[1], pos[2], player.worldObj.rand);
+
+						if (TreeSimulator.showParticles && sapling.blockID == Block.sapling.blockID)
+							sendPacket(pos[0], pos[1], pos[2], player.worldObj, basePlayer);
+					}
 					movementCounter = 0;
 				}
 			}
@@ -79,13 +87,14 @@ public class TickHandlerTGS implements ITickHandler {
 			{
 				ticksSinceLastCheck++;
 			}
-			
+
 			state = PlayerState.getState(player.isSneaking());
 			updatePlayerPos(player);
 		}
 	}
 
-	private void sendPacket(int x, int y, int z, World worldObj, Player player) {
+	private void sendPacket(int x, int y, int z, World worldObj, Player player)
+	{
 
 		Packet250CustomPayload packet = new Packet250CustomPayload();
 
@@ -109,22 +118,24 @@ public class TickHandlerTGS implements ITickHandler {
 		bytes[10] = (byte) ((z >> 16) & 255);
 		bytes[11] = (byte) ((z >> 24) & 255);
 
-		System.out
-				.println(x + " " + y + " " + z + " " + Arrays.toString(bytes));
+		System.out.println(x + " " + y + " " + z + " " + Arrays.toString(bytes));
 
 		packet.data = bytes;
 		PacketDispatcher.sendPacketToPlayer(packet, player);
 	}
 
-	private void updatePlayerPos(EntityPlayer player) {
+	private void updatePlayerPos(EntityPlayer player)
+	{
 		posX = player.posX;
 		posZ = player.posZ;
 	}
 
-	private int[] getNearestSapling(World world, int xpos, int ypos, int zpos) {
+	private int[] getNearestSapling(World world, int xpos, int ypos, int zpos)
+	{
 		for (int x = -5; x <= 5; x++)
 			for (int y = -2; y <= 2; y++)
-				for (int z = -5; z <= 5; z++) {
+				for (int z = -5; z <= 5; z++)
+				{
 					int id = world.getBlockId(x + xpos, y + ypos, z + zpos);
 					if (Block.blocksList[id] instanceof BlockSapling)
 						return new int[] { x + xpos, y + ypos, z + zpos };
@@ -133,17 +144,20 @@ public class TickHandlerTGS implements ITickHandler {
 	}
 
 	@Override
-	public void tickEnd(EnumSet<TickType> type, Object... tickData) {
+	public void tickEnd(EnumSet<TickType> type, Object... tickData)
+	{
 		return;
 	}
 
 	@Override
-	public EnumSet<TickType> ticks() {
+	public EnumSet<TickType> ticks()
+	{
 		return EnumSet.of(TickType.PLAYER);
 	}
 
 	@Override
-	public String getLabel() {
+	public String getLabel()
+	{
 		return "treeSimulatorTickHandler";
 	}
 }

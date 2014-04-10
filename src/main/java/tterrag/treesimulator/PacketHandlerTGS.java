@@ -27,7 +27,6 @@ public class PacketHandlerTGS implements IPacketHandler{
 			{
 				entity.worldObj.playAuxSFX(2005, x, y, z, 0);				
 			}
-			System.out.println(String.format("Packet Recieved! block:%s x:%d y:%d z:%d", block == null ? "null" : block.toString(), x, y, z));
 		}
 	}
 }
