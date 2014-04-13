@@ -112,19 +112,16 @@ public class TickHandlerTGS implements ITickHandler
 
 	private void doEngines(List<Coord> coords, World world)
 	{
-		if (!world.isRemote)
+		for (Coord pos : coords)
 		{
-			for (Coord pos : coords)
-			{
-				Block block = Block.blocksList[world.getBlockId(pos.x, pos.y, pos.z)];
+			Block block = Block.blocksList[world.getBlockId(pos.x, pos.y, pos.z)];
 
-				if (block instanceof BlockEngine)
+			if (block instanceof BlockEngine)
+			{
+				TileEngine te = (TileEngine) world.getBlockTileEntity(pos.x, pos.y, pos.z);
+				if (te != null)
 				{
-					TileEngine te = (TileEngine) world.getBlockTileEntity(pos.x, pos.y, pos.z);
-					if (te != null)
-					{
-						te.bumpEnergy(TreeSimulator.energyPerBump);
-					}
+					te.bumpEnergy(world.isRemote ? 0 : TreeSimulator.energyPerBump);
 				}
 			}
 		}

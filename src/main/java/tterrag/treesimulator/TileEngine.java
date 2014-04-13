@@ -9,6 +9,7 @@ public class TileEngine extends TileEntity implements IEnergyHandler
 {
 	private EnergyStorage storage;
 	private int perTick = 10;
+	double animationProgress = 0;
 
 	public TileEngine()
 	{
@@ -29,6 +30,10 @@ public class TileEngine extends TileEntity implements IEnergyHandler
 				}
 			}
 		}
+		
+		System.out.println((worldObj.isRemote ? "client: " : "server: ") + "  " + animationProgress);
+		if (animationProgress > Math.PI * 2)
+			animationProgress -= Math.PI * 2;
 	}
 
 	@Override
@@ -63,8 +68,12 @@ public class TileEngine extends TileEntity implements IEnergyHandler
 
 	public boolean bumpEnergy(int amnt)
 	{
+		animationProgress += 0.1;
 		if (storage.receiveEnergy(amnt, false) == amnt)
+		{
+			System.out.println("bumped! " + animationProgress);
 			return true;
+		}
 		else
 			return false;
 	}

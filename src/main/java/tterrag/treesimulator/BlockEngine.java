@@ -14,6 +14,7 @@ public class BlockEngine extends Block
 	public BlockEngine(int id)
 	{
 		super(id, Material.iron);
+		setHardness(1.0f);
 	}
 	
 	@Override
@@ -41,5 +42,23 @@ public class BlockEngine extends Block
 			par5EntityPlayer.addChatMessage("Energy Stored: " + EnumChatFormatting.YELLOW + ((TileEngine)par1World.getBlockTileEntity(par2, par3, par4)).getEnergyStored(ForgeDirection.UP) + " RF");
 		return true;
 	}
+	
+//	@Override
+//	public boolean isOpaqueCube()
+//	{
+//		return false;
+//	}
+//	
+//	@Override
+//	public boolean isBlockNormalCube(World world, int x, int y, int z)
+//	{
+//		return false;
+//	}
+//	
+//	@Override
+//	public int getRenderType()
+//	{
+//		return -1;
+//	}
 }
 	

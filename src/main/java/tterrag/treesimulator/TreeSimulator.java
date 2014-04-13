@@ -6,9 +6,11 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.Configuration;
+import tterrag.treesimulator.proxy.CommonProxy;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
+import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
@@ -26,6 +28,9 @@ public class TreeSimulator {
 	
 	public static final String CHANNEL = "TGS2014";
 	
+	@SidedProxy(clientSide="tterrag.treesimulator.proxy.ClientProxy")
+	public static CommonProxy proxy;
+	
 	@Instance
 	public static TreeSimulator instance;
 	
@@ -40,6 +45,8 @@ public class TreeSimulator {
 		engine = new BlockEngine(engineID).setUnlocalizedName("clocktwerkEngine");
 		GameRegistry.registerBlock(engine, "clocktwerkEngine");
 		GameRegistry.registerTileEntity(TileEngine.class, "tileClocktwerkEngine");
+
+		proxy.registerRenderers();
 	}
 	
 	@EventHandler
