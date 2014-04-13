@@ -2,6 +2,7 @@ package tterrag.treesimulator;
 
 import java.io.File;
 
+import net.minecraft.block.Block;
 import net.minecraftforge.common.Configuration;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -9,6 +10,7 @@ import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
+import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 
@@ -18,15 +20,23 @@ public class TreeSimulator {
 
 	public static int waitTime;
 	public static boolean showParticles;
+	public static int energyPerBump;
+	
 	public static final String CHANNEL = "TGS2014";
 	
 	@Instance
 	public static TreeSimulator instance;
 	
+	public static Block engine;
+	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
 		initConfig(event.getSuggestedConfigurationFile());
+		
+		engine = new BlockEngine(2000).setUnlocalizedName("tile.clocktwerkEngine");
+		GameRegistry.registerBlock(engine, "clocktwerkEngine");
+		GameRegistry.registerTileEntity(TileEngine.class, "tileClocktwerkEngine");
 	}
 	
 	@EventHandler
@@ -43,6 +53,7 @@ public class TreeSimulator {
 		
 		waitTime = config.get("Tweaks", "waitTime", 100, "The amount of ticks (times 5) you must be sprinting before bonemeal is applied").getInt();
 		showParticles = config.get("Tweaks", "showParticles", true, "Show bonemeal particles when appropriate. Not sure why you would turn this off, but eh").getBoolean(true);
+		energyPerBump = config.get("Tweaks", "energyPerBump", 25, "Energy (in RF) that is gotten each time the engine is \"bumped,\" meaning every time you crouch or sprint").getInt();
 		
 		config.save();
 	}

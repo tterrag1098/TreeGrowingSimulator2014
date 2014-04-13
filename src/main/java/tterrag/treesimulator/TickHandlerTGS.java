@@ -1,7 +1,10 @@
 package tterrag.treesimulator;
 
-import java.util.Arrays;
+import static tterrag.treesimulator.TickHandlerTGS.PlayerState.STANDING;
+
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSapling;
@@ -14,11 +17,9 @@ import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
-import static tterrag.treesimulator.TickHandlerTGS.PlayerState.*;
 
 public class TickHandlerTGS implements ITickHandler
 {
-
 	private double posX = 0, posZ = 0;
 	private int movementCounter = 0;
 	private int ticksSinceLastCheck = 0;
@@ -33,6 +34,18 @@ public class TickHandlerTGS implements ITickHandler
 		};
 	};
 
+	private class Coord
+	{
+		public int x, y, z;
+
+		public Coord(int x, int y, int z)
+		{
+			this.x = x;
+			this.y = y;
+			this.z = z;
+		}
+	}
+
 	private PlayerState state = STANDING;
 
 	@Override
@@ -44,43 +57,47 @@ public class TickHandlerTGS implements ITickHandler
 			Player basePlayer = (Player) tickData[0];
 			if (ticksSinceLastCheck >= 5)
 			{
-				int[] pos = getNearestSapling(player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
+				List<Coord> coords = getNearestBlocks(player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
 
-				if (pos.length == 0)
+				if (coords.size() == 0)
 					return;
 
 				if (Math.abs(player.posX - posX) > 0.25 || Math.abs(player.posZ - posZ) > 0.25)
 				{
 					movementCounter++;
+					doEngines(coords, player.worldObj);
 				}
 				if (PlayerState.getState(player.isSneaking()) != state)
 				{
 					movementCounter++;
+					doEngines(coords, player.worldObj);
 				}
 				if (movementCounter > TreeSimulator.waitTime)
 				{
-					if (pos.length == 0)
+					if (coords.size() == 0)
 					{
 						movementCounter--;
 						updatePlayerPos(player);
 						return;
 					}
 
-					BonemealEvent event = new BonemealEvent(player, player.worldObj, player.worldObj.getBlockId(pos[0], pos[1], pos[2]), pos[0], pos[1], pos[2]);
-					MinecraftForge.EVENT_BUS.post(event);
-
-					Block block = Block.blocksList[player.worldObj.getBlockId(pos[0], pos[1], pos[2])];
-
-					if (block instanceof BlockSapling)
+					for (Coord pos : coords)
 					{
-						BlockSapling sapling = (BlockSapling) block;
-						if ((double) player.worldObj.rand.nextFloat() < 0.45D)
-							sapling.markOrGrowMarked(player.worldObj, pos[0], pos[1], pos[2], player.worldObj.rand);
+						Block block = Block.blocksList[player.worldObj.getBlockId(pos.x, pos.y, pos.z)];
 
-						if (TreeSimulator.showParticles && sapling.blockID == Block.sapling.blockID)
-							sendPacket(pos[0], pos[1], pos[2], player.worldObj, basePlayer);
+						if (block instanceof BlockSapling)
+						{
+							BonemealEvent event = new BonemealEvent(player, player.worldObj, player.worldObj.getBlockId(pos.x, pos.y, pos.z), pos.x, pos.y, pos.z);
+							MinecraftForge.EVENT_BUS.post(event);
+
+							BlockSapling sapling = (BlockSapling) block;
+							if ((double) player.worldObj.rand.nextFloat() < 0.45D)
+								sapling.markOrGrowMarked(player.worldObj, pos.x, pos.y, pos.z, player.worldObj.rand);
+
+							if (TreeSimulator.showParticles && sapling.blockID == Block.sapling.blockID)
+								sendPacket(pos.x, pos.y, pos.z, player.worldObj, basePlayer);
+						}
 					}
-					movementCounter = 0;
 				}
 			}
 			else
@@ -90,6 +107,26 @@ public class TickHandlerTGS implements ITickHandler
 
 			state = PlayerState.getState(player.isSneaking());
 			updatePlayerPos(player);
+		}
+	}
+
+	private void doEngines(List<Coord> coords, World world)
+	{
+		if (!world.isRemote)
+		{
+			for (Coord pos : coords)
+			{
+				Block block = Block.blocksList[world.getBlockId(pos.x, pos.y, pos.z)];
+
+				if (block instanceof BlockEngine)
+				{
+					TileEngine te = (TileEngine) world.getBlockTileEntity(pos.x, pos.y, pos.z);
+					if (te != null)
+					{
+						te.bumpEnergy(TreeSimulator.energyPerBump);
+					}
+				}
+			}
 		}
 	}
 
@@ -118,8 +155,6 @@ public class TickHandlerTGS implements ITickHandler
 		bytes[10] = (byte) ((z >> 16) & 255);
 		bytes[11] = (byte) ((z >> 24) & 255);
 
-		System.out.println(x + " " + y + " " + z + " " + Arrays.toString(bytes));
-
 		packet.data = bytes;
 		PacketDispatcher.sendPacketToPlayer(packet, player);
 	}
@@ -130,17 +165,18 @@ public class TickHandlerTGS implements ITickHandler
 		posZ = player.posZ;
 	}
 
-	private int[] getNearestSapling(World world, int xpos, int ypos, int zpos)
+	private List<Coord> getNearestBlocks(World world, int xpos, int ypos, int zpos)
 	{
+		List<Coord> list = new ArrayList<Coord>();
 		for (int x = -5; x <= 5; x++)
 			for (int y = -2; y <= 2; y++)
 				for (int z = -5; z <= 5; z++)
 				{
 					int id = world.getBlockId(x + xpos, y + ypos, z + zpos);
-					if (Block.blocksList[id] instanceof BlockSapling)
-						return new int[] { x + xpos, y + ypos, z + zpos };
+					if (Block.blocksList[id] instanceof BlockSapling || Block.blocksList[id] instanceof BlockEngine)
+						list.add(new Coord(x + xpos, y + ypos, z + zpos));
 				}
-		return new int[] {};
+		return list;
 	}
 
 	@Override
