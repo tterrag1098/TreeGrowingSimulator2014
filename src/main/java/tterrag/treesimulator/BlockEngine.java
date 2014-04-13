@@ -2,6 +2,7 @@ package tterrag.treesimulator;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumChatFormatting;
@@ -13,6 +14,12 @@ public class BlockEngine extends Block
 	public BlockEngine(int id)
 	{
 		super(id, Material.iron);
+	}
+	
+	@Override
+	public void registerIcons(IconRegister par1IconRegister)
+	{
+		this.blockIcon = par1IconRegister.registerIcon("treegrowingsimulator:clocktwerkEngine");
 	}
 		
 	@Override
