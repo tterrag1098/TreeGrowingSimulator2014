@@ -98,6 +98,7 @@ public class TickHandlerTGS implements ITickHandler
 								sendPacket(pos.x, pos.y, pos.z, player.worldObj, basePlayer);
 						}
 					}
+					movementCounter = 0;
 				}
 			}
 			else
