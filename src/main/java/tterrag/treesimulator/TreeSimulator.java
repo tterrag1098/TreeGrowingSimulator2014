@@ -28,7 +28,7 @@ public class TreeSimulator {
 	
 	public static final String CHANNEL = "TGS2014";
 	
-	@SidedProxy(clientSide="tterrag.treesimulator.proxy.ClientProxy")
+	@SidedProxy(clientSide="tterrag.treesimulator.proxy.ClientProxy", serverSide="tterrag.treesimulator.proxy.CommonProxy")
 	public static CommonProxy proxy;
 	
 	@Instance
