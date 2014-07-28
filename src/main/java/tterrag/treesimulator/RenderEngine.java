@@ -38,7 +38,7 @@ public class RenderEngine extends TileEntitySpecialRenderer
 			
 			model.renderAllExceptAnimated(0.0625f);
 			GL11.glTranslated(0, Math.sin(i) / 10, 0);
-			if (te.worldObj.getWorldTime() % 20 == 0)
+			if (te.getWorldObj().getWorldTime() % 20 == 0)
 				System.out.println(i + " : " + Math.sin(i)); 
 			model.renderAnimated(0.0625f);
 		}

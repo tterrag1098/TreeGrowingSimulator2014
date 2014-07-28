@@ -2,25 +2,26 @@ package tterrag.treesimulator;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 
 public class BlockEngine extends Block
 {
-	public BlockEngine(int id)
+	public BlockEngine()
 	{
-		super(id, Material.iron);
+		super(Material.iron);
 		setHardness(1.0f);
 	}
 	
 	@Override
-	public void registerIcons(IconRegister par1IconRegister)
+	public void registerBlockIcons(IIconRegister par1IIconRegister)
 	{
-		this.blockIcon = par1IconRegister.registerIcon("treegrowingsimulator:clocktwerkEngine");
+		this.blockIcon = par1IIconRegister.registerIcon("treegrowingsimulator:clocktwerkEngine");
 	}
 		
 	@Override
@@ -39,7 +40,7 @@ public class BlockEngine extends Block
 	public boolean onBlockActivated(World par1World, int par2, int par3, int par4, EntityPlayer par5EntityPlayer, int par6, float par7, float par8, float par9)
 	{
 		if (!par1World.isRemote)
-			par5EntityPlayer.addChatMessage("Energy Stored: " + EnumChatFormatting.YELLOW + ((TileEngine)par1World.getBlockTileEntity(par2, par3, par4)).getEnergyStored(ForgeDirection.UP) + " RF");
+			par5EntityPlayer.addChatMessage(new ChatComponentText("Energy Stored: " + EnumChatFormatting.YELLOW + ((TileEngine)par1World.getTileEntity(par2, par3, par4)).getEnergyStored(ForgeDirection.UP) + " RF"));
 		return true;
 	}
 	

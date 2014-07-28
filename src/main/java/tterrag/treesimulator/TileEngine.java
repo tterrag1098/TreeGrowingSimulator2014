@@ -1,7 +1,7 @@
 package tterrag.treesimulator;
 
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import cofh.api.energy.EnergyStorage;
 import cofh.api.energy.IEnergyHandler;
 
@@ -23,7 +23,7 @@ public class TileEngine extends TileEntity implements IEnergyHandler
 		{
 			for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
 			{
-				TileEntity tile = this.worldObj.getBlockTileEntity(this.xCoord + side.offsetX, this.yCoord + side.offsetY, this.zCoord + side.offsetZ);
+				TileEntity tile = this.worldObj.getTileEntity(this.xCoord + side.offsetX, this.yCoord + side.offsetY, this.zCoord + side.offsetZ);
 				if ((tile instanceof IEnergyHandler))
 				{
 					this.storage.extractEnergy(((IEnergyHandler) tile).receiveEnergy(side.getOpposite(), this.storage.extractEnergy(perTick, true), false), false);
@@ -47,13 +47,13 @@ public class TileEngine extends TileEntity implements IEnergyHandler
 	{
 		return storage.extractEnergy(maxExtract, simulate);
 	}
-
+    
 	@Override
-	public boolean canInterface(ForgeDirection from)
-	{
-		return true;
-	}
-
+    public boolean canConnectEnergy(ForgeDirection from)
+    {
+	    return true;
+    }
+    
 	@Override
 	public int getEnergyStored(ForgeDirection from)
 	{

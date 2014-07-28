@@ -3,23 +3,21 @@ package tterrag.treesimulator;
 import java.io.File;
 
 import net.minecraft.block.Block;
-import net.minecraft.item.Item;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.config.Configuration;
 import tterrag.treesimulator.proxy.CommonProxy;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.TickRegistry;
-import cpw.mods.fml.relauncher.Side;
 
 @Mod(modid = "treeGrowingSimulator", version = "0.0.3", name = "Tree Growing Simulator 2014")
-@NetworkMod(serverSideRequired=true, clientSideRequired=false, channels = {TreeSimulator.CHANNEL}, packetHandler = PacketHandlerTGS.class)
 public class TreeSimulator {
 
 	public static int waitTime;
@@ -34,7 +32,6 @@ public class TreeSimulator {
 	@Instance
 	public static TreeSimulator instance;
 	
-	public static int engineID;
 	public static Block engine;
 	
 	@EventHandler
@@ -42,7 +39,7 @@ public class TreeSimulator {
 	{
 		initConfig(event.getSuggestedConfigurationFile());
 		
-		engine = new BlockEngine(engineID).setUnlocalizedName("clocktwerkEngine");
+		engine = new BlockEngine().setBlockName("clocktwerkEngine");
 		GameRegistry.registerBlock(engine, "clocktwerkEngine");
 		GameRegistry.registerTileEntity(TileEngine.class, "tileClocktwerkEngine");
 
@@ -51,17 +48,19 @@ public class TreeSimulator {
 	
 	@EventHandler
 	public void init(FMLInitializationEvent event)
-	{
-		TickRegistry.registerTickHandler(new TickHandlerTGS(), Side.SERVER);
-		
+	{		
+	    PacketHandlerTGS.init();
+	    
+	    FMLCommonHandler.instance().bus().register(new TickHandlerTGS());
+	    
 		GameRegistry.addRecipe(new ItemStack(engine), 
 				"sis",
 				"ibi",
 				"sis",
 				
-				's', Block.stone,
-				'i', Item.ingotIron,
-				'b', Block.fenceIron
+				's', Blocks.stone,
+				'i', Items.iron_ingot,
+				'b', Blocks.iron_bars
 		);
 	}
 	
@@ -75,7 +74,6 @@ public class TreeSimulator {
 		showParticles = config.get("Tweaks", "showParticles", true, "Show bonemeal particles when appropriate. Not sure why you would turn this off, but eh").getBoolean(true);
 		energyPerBump = config.get("Tweaks", "energyPerBump", 25, "Energy (in RF) that is gotten each time the engine is \"bumped,\" meaning every time you crouch or sprint").getInt();
 		
-		engineID = config.getBlock("clocktwerkEngine", 1042, "ID for the Clocktwerk Engine").getInt() - 256;
 		config.save();
 	}
 }
