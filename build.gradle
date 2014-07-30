@@ -54,7 +54,7 @@ version = "MC${config.minecraft_version}-${artifact_version}-${buildInfo.buildNu
 def actualVersion = "${artifact_version}-${buildInfo.buildNum}"
 
 minecraft {
-	version = "1.7.10-10.13.0.1188"
+	version = "${config.minecraft_version}-${config.forge_version}"
 }
 
 dependencies {
