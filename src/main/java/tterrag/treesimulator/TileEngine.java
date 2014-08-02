@@ -31,7 +31,6 @@ public class TileEngine extends TileEntity implements IEnergyHandler
 			}
 		}
 		
-		System.out.println((worldObj.isRemote ? "client: " : "server: ") + "  " + animationProgress);
 		if (animationProgress > Math.PI * 2)
 			animationProgress -= Math.PI * 2;
 	}
@@ -71,7 +70,6 @@ public class TileEngine extends TileEntity implements IEnergyHandler
 		animationProgress += 0.1;
 		if (storage.receiveEnergy(amnt, false) == amnt)
 		{
-			System.out.println("bumped! " + animationProgress);
 			return true;
 		}
 		else

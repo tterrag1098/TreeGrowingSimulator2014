@@ -53,7 +53,6 @@ public class TickHandlerTGS
 	{
 	    Integer temp = counters.get(event.player.getCommandSenderName());
 	    int movementCounter = temp == null ? 0 : temp;
-	    System.out.println(movementCounter);
 	    
 		if (event.phase == Phase.END)
 		{
