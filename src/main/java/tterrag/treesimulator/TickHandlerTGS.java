@@ -54,7 +54,7 @@ public class TickHandlerTGS
 	    Integer temp = counters.get(event.player.getCommandSenderName());
 	    int movementCounter = temp == null ? 0 : temp;
 	    
-		if (event.phase == Phase.END)
+		if (event.phase == Phase.END && !event.player.worldObj.isRemote)
 		{
 			EntityPlayer player = (EntityPlayer) event.player;
 			if (ticksSinceLastCheck >= 5)
