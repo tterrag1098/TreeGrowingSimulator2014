@@ -55,9 +55,6 @@ def actualVersion = "${artifact_version}-${buildInfo.buildNum}"
 
 minecraft {
 	version = "${config.minecraft_version}-${config.forge_version}"
-	
-	replace "@VERSION@", project.version
-    replaceIn "EnderIO.java"
 }
 
 dependencies {
