@@ -70,7 +70,7 @@ public class TreeSimulator {
 		
 		config.load();
 		
-		waitTime = config.get("Tweaks", "waitTime", 100, "The amount of ticks (times 5) you must be sprinting before bonemeal is applied").getInt();
+		waitTime = config.get("Tweaks", "waitTime", 100, "The amount of ticks (times 5) you must be crouching or sprinting before bonemeal is applied").getInt();
 		showParticles = config.get("Tweaks", "showParticles", true, "Show bonemeal particles when appropriate. Not sure why you would turn this off, but eh").getBoolean(true);
 		energyPerBump = config.get("Tweaks", "energyPerBump", 25, "Energy (in RF) that is gotten each time the engine is \"bumped,\" meaning every time you crouch or sprint").getInt();
 		

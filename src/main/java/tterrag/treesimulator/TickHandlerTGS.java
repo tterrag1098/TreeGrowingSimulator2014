@@ -2,10 +2,11 @@ package tterrag.treesimulator;
 
 import static tterrag.treesimulator.TickHandlerTGS.PlayerState.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSapling;
@@ -59,7 +60,7 @@ public class TickHandlerTGS
 			EntityPlayer player = (EntityPlayer) event.player;
 			if (ticksSinceLastCheck >= 5)
 			{
-				Set<Coord> coords = getNearestBlocks(player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
+				List<Coord> coords = getNearestBlocks(player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
 
 				if (coords.size() == 0)
 					return;
@@ -82,6 +83,8 @@ public class TickHandlerTGS
 						updatePlayerPos(player);
 						return;
 					}
+					
+					Collections.shuffle(coords);
 
 					for (Coord pos : coords)
 					{
@@ -116,7 +119,7 @@ public class TickHandlerTGS
 		}
 	}
 
-	private void doEngines(Set<Coord> coords, World world)
+	private void doEngines(List<Coord> coords, World world)
 	{
 		for (Coord pos : coords)
 		{
@@ -144,9 +147,9 @@ public class TickHandlerTGS
 		posZ = player.posZ;
 	}
 
-	private Set<Coord> getNearestBlocks(World world, int xpos, int ypos, int zpos)
+	private List<Coord> getNearestBlocks(World world, int xpos, int ypos, int zpos)
 	{
-		Set<Coord> list = new HashSet<Coord>();
+		List<Coord> list = new ArrayList<Coord>();
 		for (int x = -5; x <= 5; x++)
 			for (int y = -2; y <= 2; y++)
 				for (int z = -5; z <= 5; z++)
