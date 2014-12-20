@@ -1,7 +1,5 @@
 package tterrag.treesimulator;
 
-import static tterrag.treesimulator.TickHandlerTGS.PlayerState.*;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,8 +19,8 @@ import cpw.mods.fml.common.gameevent.TickEvent.PlayerTickEvent;
 
 public class TickHandlerTGS
 {
-	private double posX = 0, posZ = 0;
 	private Map<String, Integer> counters = new HashMap<String, Integer>();
+	private Map<String, PlayerState> states = new HashMap<String, PlayerState>();
 	private int ticksSinceLastCheck = 0;
 
 	public enum PlayerState
@@ -47,7 +45,6 @@ public class TickHandlerTGS
 		}
 	}
 
-	private PlayerState state = STANDING;
 
 	@SubscribeEvent
 	public void onPlayerTick(PlayerTickEvent event)
@@ -65,12 +62,12 @@ public class TickHandlerTGS
 				if (coords.size() == 0)
 					return;
 
-				if (Math.abs(player.posX - posX) > 0.5 || Math.abs(player.posZ - posZ) > 0.5)
+				if (player.isSprinting())
 				{
 					movementCounter++;
 					doEngines(coords, player.worldObj);
 				}
-				if (PlayerState.getState(player.isSneaking()) != state)
+				if (PlayerState.getState(player.isSneaking()) != getState(player))
 				{
 					movementCounter++;
 					doEngines(coords, player.worldObj);
@@ -80,7 +77,6 @@ public class TickHandlerTGS
 					if (coords.size() == 0)
 					{
 						movementCounter--;
-						updatePlayerPos(player);
 						return;
 					}
 					
@@ -113,10 +109,18 @@ public class TickHandlerTGS
 				ticksSinceLastCheck++;
 			}
 
-			state = PlayerState.getState(player.isSneaking());
-			updatePlayerPos(player);
+			states.put(player.getCommandSenderName(), PlayerState.getState(player.isSneaking()));
 			counters.put(event.player.getCommandSenderName(), movementCounter);
 		}
+	}
+	
+	private PlayerState getState(EntityPlayer player) 
+	{
+	    String user = player.getCommandSenderName();
+	    if (!states.containsKey(user)) {
+	        states.put(user, PlayerState.getState(player.isSneaking()));
+	    }
+	    return states.get(user);
 	}
 
 	private void doEngines(List<Coord> coords, World world)
@@ -139,12 +143,6 @@ public class TickHandlerTGS
 	private void sendPacket(int x, int y, int z)
 	{
 		PacketHandlerTGS.INSTANCE.sendToAll(new MessageBonemealParticles(x, y, z));
-	}
-
-	private void updatePlayerPos(EntityPlayer player)
-	{
-		posX = player.posX;
-		posZ = player.posZ;
 	}
 
 	private List<Coord> getNearestBlocks(World world, int xpos, int ypos, int zpos)
