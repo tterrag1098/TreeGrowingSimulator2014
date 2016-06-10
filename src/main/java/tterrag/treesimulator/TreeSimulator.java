@@ -3,28 +3,30 @@ package tterrag.treesimulator;
 import java.io.File;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.config.Configuration;
 import tterrag.treesimulator.proxy.CommonProxy;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
-@Mod(modid = "treeGrowingSimulator", version = "0.0.3", name = "Tree Growing Simulator 2014")
+@Mod(modid = "treeGrowingSimulator", version = "0.0.4", name = "Tree Growing Simulator 2016")
 public class TreeSimulator {
 
 	public static int waitTime;
-	public static boolean showParticles;
+	public static boolean showParticles = true;
 	public static int energyPerBump;
 	
-	public static final String CHANNEL = "TGS2014";
+	public static final String CHANNEL = "TGS2016";
 	
 	@SidedProxy(clientSide="tterrag.treesimulator.proxy.ClientProxy", serverSide="tterrag.treesimulator.proxy.CommonProxy")
 	public static CommonProxy proxy;
@@ -38,10 +40,6 @@ public class TreeSimulator {
 	public void preInit(FMLPreInitializationEvent event)
 	{
 		initConfig(event.getSuggestedConfigurationFile());
-		
-		engine = new BlockEngine().setBlockName("clocktwerkEngine");
-		GameRegistry.registerBlock(engine, "clocktwerkEngine");
-		GameRegistry.registerTileEntity(TileEngine.class, "tileClocktwerkEngine");
 
 		proxy.registerRenderers();
 	}
@@ -53,15 +51,17 @@ public class TreeSimulator {
 	    
 	    FMLCommonHandler.instance().bus().register(new TickHandlerTGS());
 	    
-		GameRegistry.addRecipe(new ItemStack(engine), 
+	    //Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(BlockEngine, 0, new ModelResourceLocation("treegrowingsimulator" + ":" + "clocktwerkengine", "inventory"));
+	    
+		/* GameRegistry.addRecipe(new ItemStack(engine), 
 				"sis",
 				"ibi",
 				"sis",
 				
-				's', Blocks.stone,
-				'i', Items.iron_ingot,
-				'b', Blocks.iron_bars
-		);
+				's', Blocks.STONE,
+				'i', Items.IRON_INGOT,
+				'b', Blocks.IRON_BARS
+		); */
 	}
 	
 	private void initConfig(File file)

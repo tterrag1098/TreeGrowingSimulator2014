@@ -1,0 +1,11 @@
+[{
+    "modid": "treesimulator",
+    "name": "Tree Growing Simulator 2016",
+    "description": "A mod that allows you to speed up tree growth by running and dancing around them! Yes, really.",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "authorList": ["tterrag","CaptainSwag101],
+    "credits": "",
+    "logoFile": ""
+}]

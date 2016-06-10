@@ -10,12 +10,13 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.BonemealEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
-import cpw.mods.fml.common.gameevent.TickEvent.PlayerTickEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 
 public class TickHandlerTGS
 {
@@ -49,15 +50,15 @@ public class TickHandlerTGS
 	@SubscribeEvent
 	public void onPlayerTick(PlayerTickEvent event)
 	{
-	    Integer temp = counters.get(event.player.getCommandSenderName());
+	    Integer temp = counters.get(event.player.getCommandSenderEntity().getName());
 	    int movementCounter = temp == null ? 0 : temp;
 	    
-		if (event.phase == Phase.END && !event.player.worldObj.isRemote)
+		if (event.phase == Phase.END && !event.player.getEntityWorld().isRemote)
 		{
 			EntityPlayer player = (EntityPlayer) event.player;
 			if (ticksSinceLastCheck >= 5)
 			{
-				List<Coord> coords = getNearestBlocks(player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
+				List<Coord> coords = getNearestBlocks(player.getEntityWorld(), (int) player.posX, (int) player.posY, (int) player.posZ);
 
 				if (coords.size() == 0)
 					return;
@@ -65,12 +66,12 @@ public class TickHandlerTGS
 				if (player.isSprinting())
 				{
 					movementCounter++;
-					doEngines(coords, player.worldObj);
+					doEngines(coords, player.getEntityWorld());
 				}
 				if (PlayerState.getState(player.isSneaking()) != getState(player))
 				{
 					movementCounter++;
-					doEngines(coords, player.worldObj);
+					doEngines(coords, player.getEntityWorld());
 				}
 				if (movementCounter > TreeSimulator.waitTime)
 				{
@@ -84,18 +85,18 @@ public class TickHandlerTGS
 
 					for (Coord pos : coords)
 					{
-						Block block = player.worldObj.getBlock(pos.x, pos.y, pos.z);
+						Block block = player.getEntityWorld().getBlockState(new BlockPos(pos.x, pos.y, pos.z)).getBlock();
 
 						if (block instanceof BlockSapling)
 						{
-							BonemealEvent bonemeal = new BonemealEvent(player, player.worldObj, player.worldObj.getBlock(pos.x, pos.y, pos.z), pos.x, pos.y, pos.z);
+							BonemealEvent bonemeal = new BonemealEvent(player, player.getEntityWorld(), new BlockPos(pos.x, pos.y, pos.z), player.getEntityWorld().getBlockState(new BlockPos(pos.x, pos.y, pos.z)));
 							MinecraftForge.EVENT_BUS.post(bonemeal);
 
 							BlockSapling sapling = (BlockSapling) block;
-							if ((double) player.worldObj.rand.nextFloat() < 0.45D)
-								sapling.func_149879_c(player.worldObj, pos.x, pos.y, pos.z, player.worldObj.rand);
+							if ((double) player.getEntityWorld().rand.nextFloat() < 0.45D)
+								sapling.grow(player.getEntityWorld(), new BlockPos(pos.x, pos.y, pos.z), player.getEntityWorld().getBlockState(new BlockPos(pos.x, pos.y, pos.z)), player.getEntityWorld().rand);
 
-							if (TreeSimulator.showParticles && sapling == Blocks.sapling)
+							if (TreeSimulator.showParticles && sapling == Blocks.SAPLING)
 								sendPacket(pos.x, pos.y, pos.z);
 							
 							break;
@@ -109,34 +110,26 @@ public class TickHandlerTGS
 				ticksSinceLastCheck++;
 			}
 
-			states.put(player.getCommandSenderName(), PlayerState.getState(player.isSneaking()));
-			counters.put(event.player.getCommandSenderName(), movementCounter);
+			states.put(player.getCommandSenderEntity().getName(), PlayerState.getState(player.isSneaking()));
+			counters.put(event.player.getCommandSenderEntity().getName(), movementCounter);
 		}
 	}
 	
 	private PlayerState getState(EntityPlayer player) 
 	{
-	    String user = player.getCommandSenderName();
+	    String user = player.getCommandSenderEntity().getName();
 	    if (!states.containsKey(user)) {
 	        states.put(user, PlayerState.getState(player.isSneaking()));
 	    }
 	    return states.get(user);
 	}
 
+	@Deprecated
 	private void doEngines(List<Coord> coords, World world)
 	{
 		for (Coord pos : coords)
 		{
-			Block block = world.getBlock(pos.x, pos.y, pos.z);
-
-			if (block instanceof BlockEngine)
-			{
-				TileEngine te = (TileEngine) world.getTileEntity(pos.x, pos.y, pos.z);
-				if (te != null)
-				{
-					te.bumpEnergy(world.isRemote ? 0 : TreeSimulator.energyPerBump);
-				}
-			}
+			Block block = world.getBlockState(new BlockPos(pos.x, pos.y, pos.z)).getBlock();
 		}
 	}
 
@@ -152,8 +145,8 @@ public class TickHandlerTGS
 			for (int y = -2; y <= 2; y++)
 				for (int z = -5; z <= 5; z++)
 				{
-					Block block = world.getBlock(x + xpos, y + ypos, z + zpos);
-					if (block instanceof BlockSapling || block instanceof BlockEngine)
+					Block block = world.getBlockState(new BlockPos(x + xpos, y + ypos, z + zpos)).getBlock();
+					if (block instanceof BlockSapling)
 						list.add(new Coord(x + xpos, y + ypos, z + zpos));
 				}
 		return list;
