@@ -94,11 +94,13 @@ public class TickHandlerTGS
 
 							BlockSapling sapling = (BlockSapling) block;
 							if ((double) player.getEntityWorld().rand.nextFloat() < 0.45D)
-								sapling.grow(player.getEntityWorld(), new BlockPos(pos.x, pos.y, pos.z), player.getEntityWorld().getBlockState(new BlockPos(pos.x, pos.y, pos.z)), player.getEntityWorld().rand);
+							{
+								sapling.generateTree(player.getEntityWorld(), new BlockPos(pos.x, pos.y, pos.z), player.getEntityWorld().getBlockState(new BlockPos(pos.x, pos.y, pos.z)), player.getEntityWorld().rand);
+							}
 
 							if (TreeSimulator.showParticles && sapling == Blocks.SAPLING)
 								sendPacket(pos.x, pos.y, pos.z);
-							
+
 							break;
 						}
 					}

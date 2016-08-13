@@ -15,7 +15,7 @@ public class RenderEngine extends TileEntitySpecialRenderer
 	double i = 0;
 	
 	@Override
-	public void renderTileEntityAt(TileEntity tileentity, double x, double y, double z, float f)
+	public void renderTileEntityAt(TileEntity tileentity, double x, double y, double z, float f, int destroyStage)
 	{
 		renderEngineAt((TileEngine) tileentity, x, y, z, false);
 	}
@@ -38,7 +38,7 @@ public class RenderEngine extends TileEntitySpecialRenderer
 			
 			model.renderAllExceptAnimated(0.0625f);
 			GL11.glTranslated(0, Math.sin(i) / 10, 0);
-			if (te.getWorldObj().getWorldTime() % 20 == 0)
+			if (te.getWorld().getWorldTime() % 20 == 0)
 				System.out.println(i + " : " + Math.sin(i)); 
 			model.renderAnimated(0.0625f);
 		}

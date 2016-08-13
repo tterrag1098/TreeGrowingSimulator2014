@@ -19,22 +19,22 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-@Mod(modid = "treeGrowingSimulator", version = "0.0.4", name = "Tree Growing Simulator 2016")
+@Mod(modid = "treegrowingsimulator", version = "0.0.4", name = "Tree Growing Simulator 2014")
 public class TreeSimulator {
 
 	public static int waitTime;
 	public static boolean showParticles = true;
 	public static int energyPerBump;
 	
-	public static final String CHANNEL = "TGS2016";
+	public static final String CHANNEL = "TGS2014";
 	
 	@SidedProxy(clientSide="tterrag.treesimulator.proxy.ClientProxy", serverSide="tterrag.treesimulator.proxy.CommonProxy")
 	public static CommonProxy proxy;
 	
-	@Instance
+	@Mod.Instance
 	public static TreeSimulator instance;
 	
-	public static Block engine;
+	//public static Block engine;
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)

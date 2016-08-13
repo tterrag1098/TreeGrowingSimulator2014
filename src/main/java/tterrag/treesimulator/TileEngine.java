@@ -1,11 +1,13 @@
 package tterrag.treesimulator;
 
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import cofh.api.energy.EnergyStorage;
 import cofh.api.energy.IEnergyHandler;
+import net.minecraft.util.ITickable;
+import net.minecraft.util.math.BlockPos;
 
-public class TileEngine extends TileEntity implements IEnergyHandler
+public class TileEngine extends TileEntity implements IEnergyHandler, ITickable
 {
 	private EnergyStorage storage;
 	private int perTick = 10;
@@ -17,13 +19,13 @@ public class TileEngine extends TileEntity implements IEnergyHandler
 	}
 
 	@Override
-	public void updateEntity()
+	public void update()
 	{
 		if (!worldObj.isRemote)
 		{
-			for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
+			for (EnumFacing side : EnumFacing.VALUES)
 			{
-				TileEntity tile = this.worldObj.getTileEntity(this.xCoord + side.offsetX, this.yCoord + side.offsetY, this.zCoord + side.offsetZ);
+				TileEntity tile = this.worldObj.getTileEntity(new BlockPos(this.pos.getX() + side.getFrontOffsetX(), this.pos.getY() + side.getFrontOffsetY(), this.pos.getZ() + side.getFrontOffsetZ()));
 				if ((tile instanceof IEnergyHandler))
 				{
 					this.storage.extractEnergy(((IEnergyHandler) tile).receiveEnergy(side.getOpposite(), this.storage.extractEnergy(perTick, true), false), false);
@@ -36,31 +38,31 @@ public class TileEngine extends TileEntity implements IEnergyHandler
 	}
 
 	@Override
-	public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate)
+	public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate)
 	{
 		return 0;
 	}
 
 	@Override
-	public int extractEnergy(ForgeDirection from, int maxExtract, boolean simulate)
+	public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate)
 	{
 		return storage.extractEnergy(maxExtract, simulate);
 	}
     
 	@Override
-    public boolean canConnectEnergy(ForgeDirection from)
+    public boolean canConnectEnergy(EnumFacing from)
     {
 	    return true;
     }
     
 	@Override
-	public int getEnergyStored(ForgeDirection from)
+	public int getEnergyStored(EnumFacing from)
 	{
 		return storage.getEnergyStored();
 	}
 
 	@Override
-	public int getMaxEnergyStored(ForgeDirection from)
+	public int getMaxEnergyStored(EnumFacing from)
 	{
 		return storage.getMaxEnergyStored();
 	}
