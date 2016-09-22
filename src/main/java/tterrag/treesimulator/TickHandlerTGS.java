@@ -34,19 +34,6 @@ public class TickHandlerTGS
 		};
 	};
 
-	private class Coord
-	{
-		public int x, y, z;
-
-		public Coord(int x, int y, int z)
-		{
-			this.x = x;
-			this.y = y;
-			this.z = z;
-		}
-	}
-
-
 	@SubscribeEvent
 	public void onPlayerTick(PlayerTickEvent event)
 	{
@@ -58,7 +45,7 @@ public class TickHandlerTGS
 			EntityPlayer player = (EntityPlayer) event.player;
 			if (ticksSinceLastCheck >= 5)
 			{
-				List<Coord> coords = getNearestBlocks(player.getEntityWorld(), (int) player.posX, (int) player.posY, (int) player.posZ);
+				List<BlockPos> coords = getNearestBlocks(player.getEntityWorld(), new BlockPos(player));
 
 				if (coords.size() == 0)
 					return;
@@ -66,11 +53,13 @@ public class TickHandlerTGS
 				if (player.isSprinting())
 				{
 					movementCounter++;
+	                sendPlayerPacket(player, coords);
 					doEngines(coords, player.getEntityWorld());
 				}
 				if (PlayerState.getState(player.isSneaking()) != getState(player))
 				{
 					movementCounter++;
+                    sendPlayerPacket(player, coords);
 					doEngines(coords, player.getEntityWorld());
 				}
 				if (movementCounter > TreeSimulator.waitTime)
@@ -83,23 +72,23 @@ public class TickHandlerTGS
 					
 					Collections.shuffle(coords);
 
-					for (Coord pos : coords)
+					for (BlockPos pos : coords)
 					{
-						Block block = player.getEntityWorld().getBlockState(new BlockPos(pos.x, pos.y, pos.z)).getBlock();
+						Block block = player.getEntityWorld().getBlockState(pos).getBlock();
 
 						if (block instanceof BlockSapling)
 						{
-							BonemealEvent bonemeal = new BonemealEvent(player, player.getEntityWorld(), new BlockPos(pos.x, pos.y, pos.z), player.getEntityWorld().getBlockState(new BlockPos(pos.x, pos.y, pos.z)));
+							BonemealEvent bonemeal = new BonemealEvent(player, player.getEntityWorld(), pos, player.getEntityWorld().getBlockState(pos));
 							MinecraftForge.EVENT_BUS.post(bonemeal);
 
 							BlockSapling sapling = (BlockSapling) block;
 							if ((double) player.getEntityWorld().rand.nextFloat() < 0.45D)
 							{
-								sapling.generateTree(player.getEntityWorld(), new BlockPos(pos.x, pos.y, pos.z), player.getEntityWorld().getBlockState(new BlockPos(pos.x, pos.y, pos.z)), player.getEntityWorld().rand);
+								sapling.generateTree(player.getEntityWorld(), pos, player.getEntityWorld().getBlockState(pos), player.getEntityWorld().rand);
 							}
 
 							if (TreeSimulator.showParticles && sapling == Blocks.SAPLING)
-								sendPacket(pos.x, pos.y, pos.z);
+								sendBonemealPacket(pos);
 
 							break;
 						}
@@ -116,8 +105,8 @@ public class TickHandlerTGS
 			counters.put(event.player.getCommandSenderEntity().getName(), movementCounter);
 		}
 	}
-	
-	private PlayerState getState(EntityPlayer player) 
+
+    private PlayerState getState(EntityPlayer player) 
 	{
 	    String user = player.getCommandSenderEntity().getName();
 	    if (!states.containsKey(user)) {
@@ -127,30 +116,34 @@ public class TickHandlerTGS
 	}
 
 	@Deprecated
-	private void doEngines(List<Coord> coords, World world)
+	private void doEngines(List<BlockPos> coords, World world)
 	{
-		for (Coord pos : coords)
+		for (BlockPos pos : coords)
 		{
-			Block block = world.getBlockState(new BlockPos(pos.x, pos.y, pos.z)).getBlock();
+			Block block = world.getBlockState(pos).getBlock();
 		}
 	}
 
-	private void sendPacket(int x, int y, int z)
+	private void sendBonemealPacket(BlockPos pos)
 	{
-		PacketHandlerTGS.INSTANCE.sendToAll(new MessageBonemealParticles(x, y, z));
+		PacketHandlerTGS.INSTANCE.sendToAll(new MessageBonemealParticles(pos));
 	}
+		   
+    private void sendPlayerPacket(EntityPlayer player, List<BlockPos> coords) {
+        for (BlockPos pos : coords) {
+            PacketHandlerTGS.INSTANCE.sendToDimension(new MessagePlayerParticle(player, pos), player.worldObj.provider.getDimension());
+        }
+    }
 
-	private List<Coord> getNearestBlocks(World world, int xpos, int ypos, int zpos)
-	{
-		List<Coord> list = new ArrayList<Coord>();
-		for (int x = -5; x <= 5; x++)
-			for (int y = -2; y <= 2; y++)
-				for (int z = -5; z <= 5; z++)
-				{
-					Block block = world.getBlockState(new BlockPos(x + xpos, y + ypos, z + zpos)).getBlock();
-					if (block instanceof BlockSapling)
-						list.add(new Coord(x + xpos, y + ypos, z + zpos));
-				}
-		return list;
-	}
+	private List<BlockPos> getNearestBlocks(World world, BlockPos pos)
+    {
+        List<BlockPos> list = new ArrayList<BlockPos>();
+        for (BlockPos p : BlockPos.getAllInBox(pos.add(-5, -2, -5), pos.add(5, 2, 5))) {
+            Block block = world.getBlockState(p).getBlock();
+            if (block instanceof BlockSapling) {
+                list.add(p);
+            }
+        }
+        return list;
+    }
 }

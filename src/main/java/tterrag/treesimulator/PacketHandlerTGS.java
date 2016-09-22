@@ -10,6 +10,7 @@ public class PacketHandlerTGS
     
     public static void init()
     {
-        INSTANCE.registerMessage(MessageBonemealParticles.class, MessageBonemealParticles.class, 0, Side.CLIENT);
+        INSTANCE.registerMessage(MessageBonemealParticles.Handler.class, MessageBonemealParticles.class, 0, Side.CLIENT);
+        INSTANCE.registerMessage(MessagePlayerParticle.Handler.class, MessagePlayerParticle.class, 1, Side.CLIENT);
     }
 }
