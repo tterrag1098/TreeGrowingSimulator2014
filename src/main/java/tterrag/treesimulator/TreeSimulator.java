@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-@Mod(modid = "treegrowingsimulator", version = "0.0.4", name = "Tree Growing Simulator 2014")
+@Mod(modid = "treegrowingsimulator", version = "0.0.4", name = "Tree Growing Simulator 2014", acceptedMinecraftVersions = "[1.9.4,1.13)")
 public class TreeSimulator {
 
 	public static int waitTime;

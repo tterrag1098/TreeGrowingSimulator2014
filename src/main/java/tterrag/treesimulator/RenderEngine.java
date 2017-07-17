@@ -14,6 +14,13 @@ public class RenderEngine extends TileEntitySpecialRenderer
 	
 	double i = 0;
 	
+	// 1.12's render()
+	// @Override
+    public void func_192841_a(TileEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) 
+    {
+    	renderTileEntityAt(te, x, y, z, partialTicks, destroyStage);
+    }
+	
 	@Override
 	public void renderTileEntityAt(TileEntity tileentity, double x, double y, double z, float f, int destroyStage)
 	{

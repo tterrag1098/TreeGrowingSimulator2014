@@ -10,6 +10,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -78,7 +80,12 @@ public class TickHandlerTGS
 
 						if (block instanceof BlockSapling)
 						{
-							BonemealEvent bonemeal = new BonemealEvent(player, player.getEntityWorld(), pos, player.getEntityWorld().getBlockState(pos));
+							BonemealEvent bonemeal;
+							try {
+								bonemeal = new BonemealEvent(player, player.getEntityWorld(), pos, player.getEntityWorld().getBlockState(pos));
+							} catch (Throwable t) {
+								bonemeal = new BonemealEvent(player, player.getEntityWorld(), pos, player.getEntityWorld().getBlockState(pos), EnumHand.MAIN_HAND, ItemStack.EMPTY);
+							}
 							MinecraftForge.EVENT_BUS.post(bonemeal);
 
 							BlockSapling sapling = (BlockSapling) block;
