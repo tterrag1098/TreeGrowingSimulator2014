@@ -1,13 +1,17 @@
 package tterrag.treesimulator;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Throwables;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSapling;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -35,6 +39,8 @@ public class TickHandlerTGS
 			return bool ? CROUCHED : STANDING;
 		};
 	};
+	
+	private Constructor<BonemealEvent> eventctor;
 
 	@SubscribeEvent
 	public void onPlayerTick(PlayerTickEvent event)
@@ -84,7 +90,14 @@ public class TickHandlerTGS
 							try {
 								bonemeal = new BonemealEvent(player, player.getEntityWorld(), pos, player.getEntityWorld().getBlockState(pos));
 							} catch (Throwable t) {
-								bonemeal = new BonemealEvent(player, player.getEntityWorld(), pos, player.getEntityWorld().getBlockState(pos), EnumHand.MAIN_HAND, ItemStack.EMPTY);
+							    try {
+							        if (eventctor == null) {
+							            eventctor = BonemealEvent.class.getConstructor(EntityPlayer.class, World.class, BlockPos.class, IBlockState.class, EnumHand.class, ItemStack.class);
+							        }
+							        bonemeal = eventctor.newInstance(player, player.getEntityWorld(), pos, player.getEntityWorld().getBlockState(pos), EnumHand.MAIN_HAND, new ItemStack(Blocks.AIR, 0));
+							    } catch (Exception e) {
+							        throw Throwables.propagate(e);
+							    }
 							}
 							MinecraftForge.EVENT_BUS.post(bonemeal);
 
