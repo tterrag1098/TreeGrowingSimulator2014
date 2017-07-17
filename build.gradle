@@ -12,9 +12,9 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "0.0.4"
+version = "1.0.0"
 group= "tterrag.treesimulator" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "TreeGrowingSimulator2016"
+archivesBaseName = "TreeGrowingSimulator2017"
 
 minecraft {
     version = "1.9.4-12.17.0.1957"
