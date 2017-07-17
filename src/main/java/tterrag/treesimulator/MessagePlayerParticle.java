@@ -44,12 +44,12 @@ public class MessagePlayerParticle extends MessageBonemealParticles {
                 
                 @Override
                 public void run() {
-                    EntityPlayer player = (EntityPlayer) Minecraft.getMinecraft().theWorld.getEntityByID(message.playerID);
+                    EntityPlayer player = (EntityPlayer) Minecraft.getMinecraft().world.getEntityByID(message.playerID);
                     if (player == null) {
                         return;
                     }
                     
-                    World world = player.worldObj;
+                    World world = player.world;
                     
                     Vec3d spawnPos = new Vec3d(
                             player.posX + ((world.rand.nextGaussian() - 0.5) * 0.5), 

@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.config.Configuration;
 import tterrag.treesimulator.proxy.CommonProxy;
@@ -35,12 +36,16 @@ public class TreeSimulator {
 	@Mod.Instance
 	public static TreeSimulator instance;
 	
-	//public static Block engine;
+	public static BlockEngine engine;
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
 		initConfig(event.getSuggestedConfigurationFile());
+		
+		engine = (BlockEngine) new BlockEngine().setRegistryName("engine");
+		GameRegistry.register(engine);
+		GameRegistry.register(new ItemBlock(engine).setRegistryName(engine.getRegistryName()));
 
 		proxy.registerRenderers();
 	}
@@ -52,9 +57,8 @@ public class TreeSimulator {
 	    
 	    FMLCommonHandler.instance().bus().register(new TickHandlerTGS());
 	    
-	    //Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(BlockEngine, 0, new ModelResourceLocation("treegrowingsimulator" + ":" + "clocktwerkengine", "inventory"));
 	    
-		/* GameRegistry.addRecipe(new ItemStack(engine), 
+		GameRegistry.addRecipe(new ItemStack(engine), 
 				"sis",
 				"ibi",
 				"sis",
@@ -62,7 +66,7 @@ public class TreeSimulator {
 				's', Blocks.STONE,
 				'i', Items.IRON_INGOT,
 				'b', Blocks.IRON_BARS
-		); */
+		);
 	}
 	
 	private void initConfig(File file)

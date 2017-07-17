@@ -2,13 +2,18 @@ package tterrag.treesimulator;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.energy.CapabilityEnergy;
 
 public class BlockEngine extends Block
 {
@@ -17,49 +22,49 @@ public class BlockEngine extends Block
 		super(Material.IRON);
 		setHardness(1.0f);
 	}
-	
-	/* @Override
-	public void registerBlockIcons(IIconRegister par1IIconRegister)
-	{
-		this.blockIcon = par1IIconRegister.registerIcon("treegrowingsimulator:clocktwerkEngine");
-	}
 		
 	@Override
-	public boolean hasTileEntity(int metadata)
+	public boolean hasTileEntity(IBlockState state)
 	{
 		return true;
 	}
 	
 	@Override
-	public TileEntity createTileEntity(World world, int metadata)
+	public TileEntity createTileEntity(World world, IBlockState state)
 	{
 		return new TileEngine();
 	}
 	
 	@Override
-	public boolean onBlockActivated(World par1World, int par2, int par3, int par4, EntityPlayer par5EntityPlayer, int par6, float par7, float par8, float par9)
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) 
 	{
-		if (!par1World.isRemote)
-			par5EntityPlayer.addChatMessage(new TextComponentString("Energy Stored: " + TextFormatting.YELLOW + ((TileEngine)par1World.getTileEntity(new BlockPos(par2, par3, par4))).getEnergyStored(EnumFacing.UP) + " RF"));
-		return true;
-	} */
+        if (!worldIn.isRemote)
+        {
+            TileEntity te = worldIn.getTileEntity(pos);
+            if (te != null && te.hasCapability(CapabilityEnergy.ENERGY, side))
+            {
+                playerIn.sendMessage(new TextComponentString("Energy Stored: " + TextFormatting.YELLOW + te.getCapability(CapabilityEnergy.ENERGY, side).getEnergyStored() + " FE"));
+            }
+        }
+        return true;
+    }
 	
-//	@Override
-//	public boolean isOpaqueCube()
-//	{
-//		return false;
-//	}
-//	
-//	@Override
-//	public boolean isBlockNormalCube(World world, int x, int y, int z)
-//	{
-//		return false;
-//	}
-//	
-//	@Override
-//	public int getRenderType()
-//	{
-//		return -1;
-//	}
+	@Override
+	public boolean isOpaqueCube(IBlockState state) 
+	{
+	    return false;
+	}
+	
+	@Override
+	public boolean isFullCube(IBlockState state) 
+	{
+	    return false;
+	}
+	
+	@Override
+	public EnumBlockRenderType getRenderType(IBlockState state) 
+	{
+	    return EnumBlockRenderType.INVISIBLE;
+	}
 }
 	

@@ -2,12 +2,12 @@ package tterrag.treesimulator;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import cofh.api.energy.EnergyStorage;
-import cofh.api.energy.IEnergyHandler;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.EnergyStorage;
+import net.minecraftforge.energy.IEnergyStorage;
 
-public class TileEngine extends TileEntity implements IEnergyHandler, ITickable
+public class TileEngine extends TileEntity implements ITickable
 {
 	private EnergyStorage storage;
 	private int perTick = 10;
@@ -21,50 +21,21 @@ public class TileEngine extends TileEntity implements IEnergyHandler, ITickable
 	@Override
 	public void update()
 	{
-		if (!worldObj.isRemote)
+		if (!getWorld().isRemote)
 		{
 			for (EnumFacing side : EnumFacing.VALUES)
 			{
-				TileEntity tile = this.worldObj.getTileEntity(new BlockPos(this.pos.getX() + side.getFrontOffsetX(), this.pos.getY() + side.getFrontOffsetY(), this.pos.getZ() + side.getFrontOffsetZ()));
-				if ((tile instanceof IEnergyHandler))
+				TileEntity tile = this.getWorld().getTileEntity(getPos().offset(side));
+				if (tile != null && tile.hasCapability(CapabilityEnergy.ENERGY, side.getOpposite()))
 				{
-					this.storage.extractEnergy(((IEnergyHandler) tile).receiveEnergy(side.getOpposite(), this.storage.extractEnergy(perTick, true), false), false);
+				    IEnergyStorage other = tile.getCapability(CapabilityEnergy.ENERGY, side.getOpposite());
+					this.storage.extractEnergy(other.receiveEnergy(this.storage.extractEnergy(perTick, true), false), false);
 				}
 			}
 		}
 		
 		if (animationProgress > Math.PI * 2)
 			animationProgress -= Math.PI * 2;
-	}
-
-	@Override
-	public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate)
-	{
-		return 0;
-	}
-
-	@Override
-	public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate)
-	{
-		return storage.extractEnergy(maxExtract, simulate);
-	}
-    
-	@Override
-    public boolean canConnectEnergy(EnumFacing from)
-    {
-	    return true;
-    }
-    
-	@Override
-	public int getEnergyStored(EnumFacing from)
-	{
-		return storage.getEnergyStored();
-	}
-
-	@Override
-	public int getMaxEnergyStored(EnumFacing from)
-	{
-		return storage.getMaxEnergyStored();
 	}
 
 	public boolean bumpEnergy(int amnt)

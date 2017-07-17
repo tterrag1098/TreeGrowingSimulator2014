@@ -17,10 +17,10 @@ group= "tterrag.treesimulator" // http://maven.apache.org/guides/mini/guide-nami
 archivesBaseName = "TreeGrowingSimulator2017"
 
 minecraft {
-    version = "1.9.4-12.17.0.1957"
+    version = "1.10.2-12.18.3.2316"
     runDir = "run"
     
-    mappings = "snapshot_20160518"
+    mappings = "stable_29"
 }
 
 dependencies {

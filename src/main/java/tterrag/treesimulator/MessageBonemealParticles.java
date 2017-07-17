@@ -46,7 +46,7 @@ public class MessageBonemealParticles implements IMessage
 
                 @Override
                 public void run() {
-                    EntityPlayer entity = Minecraft.getMinecraft().thePlayer;
+                    EntityPlayer entity = Minecraft.getMinecraft().player;
                     Block block = entity.getEntityWorld().getBlockState(message.pos).getBlock();
                     if (block instanceof BlockSapling) {
                         World entWorld = entity.getEntityWorld();
