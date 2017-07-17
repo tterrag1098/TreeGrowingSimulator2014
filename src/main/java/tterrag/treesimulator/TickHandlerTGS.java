@@ -148,10 +148,14 @@ public class TickHandlerTGS
 	{
 		PacketHandlerTGS.INSTANCE.sendToAll(new MessageBonemealParticles(pos));
 	}
-		   
+
     private void sendPlayerPacket(EntityPlayer player, List<BlockPos> coords) {
-        for (BlockPos pos : coords) {
-            PacketHandlerTGS.INSTANCE.sendToDimension(new MessagePlayerParticle(player, pos), player.worldObj.provider.getDimension());
+        if (TreeSimulator.allTheParticles) {
+            for (BlockPos pos : coords) {
+                PacketHandlerTGS.INSTANCE.sendToDimension(new MessagePlayerParticle(player, pos), player.worldObj.provider.getDimension());
+            }
+        } else {
+            BlockPos pos = coords.get(player.getEntityWorld().rand.nextInt(coords.size()));
         }
     }
 
