@@ -1,73 +1,73 @@
 package tterrag.treesimulator;
 
+import java.util.function.Supplier;
+
 import javax.annotation.Nonnull;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.network.NetworkEvent.Context;
 
 public class MessagePlayerParticle extends MessageBonemealParticles {
 
-    private int playerID;
+    private final int playerID;
     
-    public MessagePlayerParticle() {}
+    public MessagePlayerParticle() {
+        this.playerID = 0;
+    }
     
-    public MessagePlayerParticle(@Nonnull EntityPlayer player, @Nonnull BlockPos pos) {
+    public MessagePlayerParticle(@Nonnull PlayerEntity player, @Nonnull BlockPos pos) {
         super(pos);
         this.playerID = player.getEntityId();
     }
     
+    MessagePlayerParticle(PacketBuffer buf) {
+        super(buf);
+        this.playerID = buf.readInt();
+    }
+    
     @Override
-    public void toBytes(ByteBuf buf) {
-        super.toBytes(buf);
+    void encode(PacketBuffer buf)
+    {
+        super.encode(buf);
         buf.writeInt(playerID);
     }
     
     @Override
-    public void fromBytes(ByteBuf buf) {
-        super.fromBytes(buf);
-        this.playerID = buf.readInt();
-    }
-
-    public static final class Handler implements IMessageHandler<MessagePlayerParticle, IMessage> {
-        
-        @Override
-        public IMessage onMessage(final MessagePlayerParticle message, MessageContext ctx) {
-            Minecraft.getMinecraft().addScheduledTask(new Runnable() {
-                
-                @Override
-                public void run() {
-                    EntityPlayer player = (EntityPlayer) Minecraft.getMinecraft().theWorld.getEntityByID(message.playerID);
-                    if (player == null) {
-                        return;
-                    }
-                    
-                    World world = player.worldObj;
-                    
-                    Vec3d spawnPos = new Vec3d(
-                            player.posX + ((world.rand.nextGaussian() - 0.5) * 0.5), 
-                            player.posY + ((world.rand.nextGaussian() - 0.5) * 0.8),
-                            player.posZ + ((world.rand.nextGaussian() - 0.5) * 0.5)
-                        );
-                    Vec3d endPos = new Vec3d(message.pos).addVector(0.5, 0.5, 0.5);
-                    
-                    Vec3d vel = spawnPos.subtract(endPos).scale(-0.02);
-                    
-                    Particle p = Minecraft.getMinecraft().effectRenderer.spawnEffectParticle(net.minecraft.util.EnumParticleTypes.VILLAGER_HAPPY.getParticleID(), spawnPos.xCoord, spawnPos.yCoord, spawnPos.zCoord, vel.xCoord, vel.yCoord, vel.zCoord);
-                    p.motionX = vel.xCoord;
-                    p.motionY = vel.yCoord;
-                    p.motionZ = vel.zCoord;
+    void handle(Supplier<Context> ctx)
+    {
+        if (TreeSimulator.COMMON_CONFIGS.allTheParticles.get()) {
+            ctx.get().enqueueWork(() -> {
+                PlayerEntity player = (PlayerEntity) Minecraft.getInstance().world.getEntityByID(playerID);
+                if (player == null) {
+                    return;
                 }
+                
+                World world = player.getEntityWorld();
+                
+                Vec3d spawnPos = new Vec3d(
+                        player.posX + (world.rand.nextGaussian() * 0.25), 
+                        player.posY + (world.rand.nextGaussian() * 0.75) + 0.8,
+                        player.posZ + (world.rand.nextGaussian() * 0.25)
+                    );
+                Vec3d endPos = new Vec3d(pos).add((world.rand.nextGaussian() * 0.3) + 0.5, (world.rand.nextGaussian() * 0.25) + 0.3, (world.rand.nextGaussian() * 0.3) + 0.5);
+                
+                Vec3d vel = spawnPos.subtract(endPos).scale(-0.04);
+                
+                Particle p = Minecraft.getInstance().worldRenderer.addParticleUnchecked(ParticleTypes.HAPPY_VILLAGER, true, spawnPos.x, spawnPos.y, spawnPos.z, vel.x, vel.y, vel.z);
+                p.motionX = vel.x;
+                p.motionY = vel.y;
+                p.motionZ = vel.z;
+                p.canCollide = true;
+                p.setMaxAge(25 + world.rand.nextInt(5));
             });
-            
-            return null;
         }
+        ctx.get().setPacketHandled(true);
     }
 }

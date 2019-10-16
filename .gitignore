@@ -12,6 +12,7 @@ run
 *.mtl
 *.classpath
 *.project
+*.launch
 /.settings
 /.gradle
 /config

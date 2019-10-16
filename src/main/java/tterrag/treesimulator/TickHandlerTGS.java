@@ -1,34 +1,29 @@
 package tterrag.treesimulator;
 
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.google.common.base.Throwables;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockSapling;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.SaplingBlock;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BoneMealItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
+import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.BonemealEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
+import net.minecraftforge.event.TickEvent.Phase;
+import net.minecraftforge.event.TickEvent.PlayerTickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.network.PacketDistributor;
 
 public class TickHandlerTGS
 {
-	private Map<String, Integer> counters = new HashMap<String, Integer>();
-	private Map<String, PlayerState> states = new HashMap<String, PlayerState>();
-	private int ticksSinceLastCheck = 0;
+	private Map<UUID, Integer> counters = new HashMap<>();
+	private Map<UUID, PlayerState> states = new HashMap<>();
 
 	public enum PlayerState
 	{
@@ -40,37 +35,35 @@ public class TickHandlerTGS
 		};
 	};
 	
-	private Constructor<BonemealEvent> eventctor;
-
 	@SubscribeEvent
 	public void onPlayerTick(PlayerTickEvent event)
 	{
-	    Integer temp = counters.get(event.player.getCommandSenderEntity().getName());
+	    Integer temp = counters.get(event.player.getGameProfile().getId());
 	    int movementCounter = temp == null ? 0 : temp;
 	    
 		if (event.phase == Phase.END && !event.player.getEntityWorld().isRemote)
 		{
-			EntityPlayer player = (EntityPlayer) event.player;
-			if (ticksSinceLastCheck >= 5)
+			PlayerEntity player = (PlayerEntity) event.player;
+			if (player.getEntityWorld().getGameTime() % 5 == 0)
 			{
 				List<BlockPos> coords = getNearestBlocks(player.getEntityWorld(), new BlockPos(player));
 
 				if (coords.size() == 0)
+				{
 					return;
+				}
 
 				if (player.isSprinting())
 				{
 					movementCounter++;
 	                sendPlayerPacket(player, coords);
-					doEngines(coords, player.getEntityWorld());
 				}
 				if (PlayerState.getState(player.isSneaking()) != getState(player))
 				{
 					movementCounter++;
                     sendPlayerPacket(player, coords);
-					doEngines(coords, player.getEntityWorld());
 				}
-				if (movementCounter > TreeSimulator.waitTime)
+				if (movementCounter > TreeSimulator.SERVER_CONFIGS.waitTime.get())
 				{
 					if (coords.size() == 0)
 					{
@@ -84,90 +77,52 @@ public class TickHandlerTGS
 					{
 						Block block = player.getEntityWorld().getBlockState(pos).getBlock();
 
-						if (block instanceof BlockSapling)
+						if (block instanceof SaplingBlock)
 						{
-							BonemealEvent bonemeal;
-							try {
-								bonemeal = new BonemealEvent(player, player.getEntityWorld(), pos, player.getEntityWorld().getBlockState(pos));
-							} catch (Throwable t) {
-							    try {
-							        if (eventctor == null) {
-							            eventctor = BonemealEvent.class.getConstructor(EntityPlayer.class, World.class, BlockPos.class, IBlockState.class, EnumHand.class, ItemStack.class);
-							        }
-							        bonemeal = eventctor.newInstance(player, player.getEntityWorld(), pos, player.getEntityWorld().getBlockState(pos), EnumHand.MAIN_HAND, new ItemStack(Blocks.AIR, 0));
-							    } catch (Exception e) {
-							        throw Throwables.propagate(e);
-							    }
-							}
-							MinecraftForge.EVENT_BUS.post(bonemeal);
+							BoneMealItem.applyBonemeal(new ItemStack(Items.BONE_MEAL), player.getEntityWorld(), pos, player);
 
-							BlockSapling sapling = (BlockSapling) block;
-							if ((double) player.getEntityWorld().rand.nextFloat() < 0.45D)
-							{
-								sapling.generateTree(player.getEntityWorld(), pos, player.getEntityWorld().getBlockState(pos), player.getEntityWorld().rand);
-							}
-
-							if (TreeSimulator.showParticles && sapling == Blocks.SAPLING)
-								sendBonemealPacket(pos);
+							if (TreeSimulator.COMMON_CONFIGS.showParticles.get())
+								sendBonemealPacket(player, pos);
 
 							break;
 						}
 					}
 					movementCounter = 0;
 				}
-			}
-			else
-			{
-				ticksSinceLastCheck++;
-			}
 
-			states.put(player.getCommandSenderEntity().getName(), PlayerState.getState(player.isSneaking()));
-			counters.put(event.player.getCommandSenderEntity().getName(), movementCounter);
+    			states.put(player.getGameProfile().getId(), PlayerState.getState(player.isSneaking()));
+    			counters.put(event.player.getGameProfile().getId(), movementCounter);
+			}
 		}
 	}
 
-    private PlayerState getState(EntityPlayer player) 
+    private PlayerState getState(PlayerEntity player) 
 	{
-	    String user = player.getCommandSenderEntity().getName();
+	    UUID user = player.getGameProfile().getId();
 	    if (!states.containsKey(user)) {
 	        states.put(user, PlayerState.getState(player.isSneaking()));
 	    }
 	    return states.get(user);
 	}
 
-	@Deprecated
-	private void doEngines(List<BlockPos> coords, World world)
+	private void sendBonemealPacket(PlayerEntity causedBy, BlockPos pos)
 	{
-		for (BlockPos pos : coords)
-		{
-			Block block = world.getBlockState(pos).getBlock();
-		}
+		PacketHandlerTGS.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> causedBy), new MessageBonemealParticles(pos));
 	}
 
-	private void sendBonemealPacket(BlockPos pos)
-	{
-		PacketHandlerTGS.INSTANCE.sendToAll(new MessageBonemealParticles(pos));
-	}
-
-    private void sendPlayerPacket(EntityPlayer player, List<BlockPos> coords) {
-        if (TreeSimulator.allTheParticles) {
+    private void sendPlayerPacket(PlayerEntity player, List<BlockPos> coords) {
+        if (TreeSimulator.COMMON_CONFIGS.allTheParticles.get()) {
             for (BlockPos pos : coords) {
-                PacketHandlerTGS.INSTANCE.sendToDimension(new MessagePlayerParticle(player, pos), player.worldObj.provider.getDimension());
+                PacketHandlerTGS.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new MessagePlayerParticle(player, pos));
             }
-        } else {
-            BlockPos pos = coords.get(player.getEntityWorld().rand.nextInt(coords.size()));
         }
     }
 
 	private List<BlockPos> getNearestBlocks(World world, BlockPos pos)
     {
-        List<BlockPos> list = new ArrayList<BlockPos>();
-        for (BlockPos p : BlockPos.getAllInBox(pos.add(-5, -2, -5), pos.add(5, 2, 5))) {
-            Block block = world.getBlockState(p).getBlock();
-            if (block instanceof BlockSapling) {
-                list.add(p);
-            }
-        }
-        return list;
+        return BlockPos.getAllInBox(pos.add(-5, -2, -5), pos.add(5, 2, 5))
+                .filter(p -> world.getBlockState(p).getBlock() instanceof SaplingBlock)
+                .map(BlockPos::toImmutable)
+                .collect(Collectors.toList());
     }
 }

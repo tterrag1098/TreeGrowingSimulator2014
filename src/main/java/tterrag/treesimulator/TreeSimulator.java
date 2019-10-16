@@ -1,81 +1,70 @@
 package tterrag.treesimulator;
 
-import java.io.File;
+import org.apache.commons.lang3.tuple.Pair;
 
-import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.config.Configuration;
-import tterrag.treesimulator.proxy.CommonProxy;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
+import net.minecraftforge.common.ForgeConfigSpec.IntValue;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.Mod.Instance;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-@Mod(modid = "treegrowingsimulator", version = "0.0.4", name = "Tree Growing Simulator 2014", acceptedMinecraftVersions = "[1.9.4,1.13)")
+@Mod("treegrowingsimulator")
 public class TreeSimulator {
+    
+    public static class ServerConfigs {
+        public final IntValue waitTime;
+        
+        ServerConfigs(ForgeConfigSpec.Builder builder) {
+            waitTime = builder.comment("The amount of ticks (times 5) you must be crouching or sprinting before bonemeal is applied.")
+                    .defineInRange("waitTime", 40, 1, 1_000_000);
+        }
+    }
+    
+    public static class CommonConfigs {
+        public final BooleanValue showParticles;
+        public final BooleanValue allTheParticles;
 
-	public static int waitTime;
-	public static boolean showParticles = true;
-	public static boolean allTheParticles = false;
-	public static int energyPerBump;
-	
-	public static final String CHANNEL = "TGS2014";
-	
-	@SidedProxy(clientSide="tterrag.treesimulator.proxy.ClientProxy", serverSide="tterrag.treesimulator.proxy.CommonProxy")
-	public static CommonProxy proxy;
-	
-	@Mod.Instance
-	public static TreeSimulator instance;
-	
-	//public static Block engine;
-	
-	@EventHandler
-	public void preInit(FMLPreInitializationEvent event)
-	{
-		initConfig(event.getSuggestedConfigurationFile());
+        CommonConfigs(ForgeConfigSpec.Builder builder) {
+            showParticles = builder.comment("Show bonemeal particles when appropriate. Not sure why you would turn this off, but eh.")
+                    .define("showParticles", true);
+            allTheParticles = builder.comment("Will spawn a LOT more particles for actions near saplings.")
+                    .define("allTheParticles", true);
+        }
+    }
 
-		proxy.registerRenderers();
+    static final ForgeConfigSpec serverSpec;
+    public static final ServerConfigs SERVER_CONFIGS;
+    static {
+        final Pair<ServerConfigs, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(ServerConfigs::new);
+        serverSpec = specPair.getRight();
+        SERVER_CONFIGS = specPair.getLeft();
+    }
+    
+    static final ForgeConfigSpec commonSpec;
+    public static final CommonConfigs COMMON_CONFIGS;
+    static {
+        final Pair<CommonConfigs, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(CommonConfigs::new);
+        commonSpec = specPair.getRight();
+        COMMON_CONFIGS = specPair.getLeft();
+    }
+
+	public static final String CHANNEL = "treegrowingsimulator";
+	
+	public TreeSimulator() {
+	    IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+	    modBus.addListener(this::init);
+	    
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, serverSpec);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, commonSpec);
 	}
 	
-	@EventHandler
-	public void init(FMLInitializationEvent event)
-	{		
+	private void init(FMLCommonSetupEvent event) {		
 	    PacketHandlerTGS.init();
-	    
-	    FMLCommonHandler.instance().bus().register(new TickHandlerTGS());
-	    
-	    //Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(BlockEngine, 0, new ModelResourceLocation("treegrowingsimulator" + ":" + "clocktwerkengine", "inventory"));
-	    
-		/* GameRegistry.addRecipe(new ItemStack(engine), 
-				"sis",
-				"ibi",
-				"sis",
-				
-				's', Blocks.STONE,
-				'i', Items.IRON_INGOT,
-				'b', Blocks.IRON_BARS
-		); */
-	}
-	
-	private void initConfig(File file)
-	{
-		Configuration config = new Configuration(file);
-		
-		config.load();
-		
-		waitTime = config.get("Tweaks", "waitTime", 100, "The amount of ticks (times 5) you must be crouching or sprinting before bonemeal is applied").getInt();
-		showParticles = config.get("Tweaks", "showParticles", true, "Show bonemeal particles when appropriate. Not sure why you would turn this off, but eh").getBoolean(true);
-		allTheParticles = config.get("Tweaks", "allTheParticles", false, "Will spawn a LOT more particles for actions near saplings.").getBoolean(false);
-		energyPerBump = config.get("Tweaks", "energyPerBump", 25, "Energy (in RF) that is gotten each time the engine is \"bumped,\" meaning every time you crouch or sprint").getInt();
-		
-		config.save();
+	    MinecraftForge.EVENT_BUS.register(new TickHandlerTGS());
 	}
 }

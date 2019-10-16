@@ -1,4 +1,4 @@
-package tterrag.treesimulator;
+/*package tterrag.treesimulator;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
@@ -280,3 +280,4 @@ public class ModelEngine extends ModelBase
 		super.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
 	}
 }
+*/
