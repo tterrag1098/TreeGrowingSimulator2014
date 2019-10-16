@@ -12,6 +12,8 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 
 public class MessagePlayerParticle extends MessageBonemealParticles {
@@ -44,7 +46,7 @@ public class MessagePlayerParticle extends MessageBonemealParticles {
     {
         if (TreeSimulator.COMMON_CONFIGS.allTheParticles.get()) {
             ctx.get().enqueueWork(() -> {
-                PlayerEntity player = (PlayerEntity) Minecraft.getInstance().world.getEntityByID(playerID);
+                PlayerEntity player = (PlayerEntity) DistExecutor.callWhenOn(Dist.CLIENT, () -> () -> Minecraft.getInstance().world.getEntityByID(playerID));
                 if (player == null) {
                     return;
                 }

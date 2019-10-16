@@ -12,6 +12,8 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 public class MessageBonemealParticles
@@ -45,7 +47,7 @@ public class MessageBonemealParticles
         if (TreeSimulator.COMMON_CONFIGS.showParticles.get()) {
             ctx.get().enqueueWork(() ->
             {
-                PlayerEntity entity = Minecraft.getInstance().player;
+                PlayerEntity entity = DistExecutor.callWhenOn(Dist.CLIENT, () -> () -> Minecraft.getInstance().player);
                 Block block = entity.getEntityWorld().getBlockState(pos).getBlock();
                 if (block instanceof SaplingBlock)
                 {
