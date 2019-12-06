@@ -15,16 +15,16 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod("treegrowingsimulator")
 public class TreeSimulator {
-    
+
     public static class ServerConfigs {
         public final IntValue waitTime;
-        
+
         ServerConfigs(ForgeConfigSpec.Builder builder) {
             waitTime = builder.comment("The amount of ticks (times 5) you must be crouching or sprinting before bonemeal is applied.")
-                    .defineInRange("waitTime", 40, 1, 1_000_000);
+                    .defineInRange("waitTime", 25, 1, 1_000_000);
         }
     }
-    
+
     public static class CommonConfigs {
         public final BooleanValue showParticles;
         public final BooleanValue allTheParticles;
@@ -44,7 +44,7 @@ public class TreeSimulator {
         serverSpec = specPair.getRight();
         SERVER_CONFIGS = specPair.getLeft();
     }
-    
+
     static final ForgeConfigSpec commonSpec;
     public static final CommonConfigs COMMON_CONFIGS;
     static {
@@ -53,18 +53,18 @@ public class TreeSimulator {
         COMMON_CONFIGS = specPair.getLeft();
     }
 
-	public static final String CHANNEL = "treegrowingsimulator";
-	
-	public TreeSimulator() {
-	    IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-	    modBus.addListener(this::init);
-	    
+    public static final String CHANNEL = "treegrowingsimulator";
+
+    public TreeSimulator() {
+        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+        modBus.addListener(this::init);
+
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, serverSpec);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, commonSpec);
-	}
-	
-	private void init(FMLCommonSetupEvent event) {		
-	    PacketHandlerTGS.init();
-	    MinecraftForge.EVENT_BUS.register(new TickHandlerTGS());
-	}
+    }
+
+    private void init(FMLCommonSetupEvent event) {		
+        PacketHandlerTGS.init();
+        MinecraftForge.EVENT_BUS.register(new TickHandlerTGS());
+    }
 }
