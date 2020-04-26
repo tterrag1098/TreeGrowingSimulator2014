@@ -58,7 +58,7 @@ public class TickHandlerTGS
 					movementCounter++;
 	                sendPlayerPacket(player, coords);
 				}
-				if (PlayerState.getState(player.isSneaking()) != getState(player))
+				if (PlayerState.getState(player.isCrouching()) != getState(player))
 				{
 					movementCounter++;
                     sendPlayerPacket(player, coords);
@@ -90,7 +90,7 @@ public class TickHandlerTGS
 					movementCounter = 0;
 				}
 
-    			states.put(player.getGameProfile().getId(), PlayerState.getState(player.isSneaking()));
+    			states.put(player.getGameProfile().getId(), PlayerState.getState(player.isCrouching()));
     			counters.put(event.player.getGameProfile().getId(), movementCounter);
 			}
 		}
@@ -100,7 +100,7 @@ public class TickHandlerTGS
 	{
 	    UUID user = player.getGameProfile().getId();
 	    if (!states.containsKey(user)) {
-	        states.put(user, PlayerState.getState(player.isSneaking()));
+	        states.put(user, PlayerState.getState(player.isCrouching()));
 	    }
 	    return states.get(user);
 	}
