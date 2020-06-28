@@ -10,7 +10,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -52,15 +52,15 @@ public class MessagePlayerParticle extends MessageBonemealParticles {
                 }
                 
                 World world = player.getEntityWorld();
-                
-                Vec3d spawnPos = new Vec3d(
+
+                Vector3d spawnPos = new Vector3d(
                         player.getPosX() + (world.rand.nextGaussian() * 0.25), 
                         player.getPosY() + (world.rand.nextGaussian() * 0.75) + 0.8,
                         player.getPosZ() + (world.rand.nextGaussian() * 0.25)
                     );
-                Vec3d endPos = new Vec3d(pos).add((world.rand.nextGaussian() * 0.3) + 0.5, (world.rand.nextGaussian() * 0.25) + 0.3, (world.rand.nextGaussian() * 0.3) + 0.5);
-                
-                Vec3d vel = spawnPos.subtract(endPos).scale(-0.04);
+                Vector3d endPos = new Vector3d(pos.getX(), pos.getY(), pos.getZ()).add((world.rand.nextGaussian() * 0.3) + 0.5, (world.rand.nextGaussian() * 0.25) + 0.3, (world.rand.nextGaussian() * 0.3) + 0.5);
+
+                Vector3d vel = spawnPos.subtract(endPos).scale(-0.04);
                 
                 Particle p = Minecraft.getInstance().worldRenderer.addParticleUnchecked(ParticleTypes.HAPPY_VILLAGER, true, spawnPos.x, spawnPos.y, spawnPos.z, vel.x, vel.y, vel.z);
                 p.motionX = vel.x;

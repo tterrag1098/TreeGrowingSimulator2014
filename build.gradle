@@ -26,7 +26,7 @@ version = "${mod_version}-${release_type}+${buildnumber}"
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 minecraft {
-	mappings channel: 'snapshot', version: '20200404-1.15.1'
+	mappings channel: 'snapshot', version: '20200514-1.16'
     
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -121,7 +121,7 @@ curseforge {
         changelog = System.getenv('CHANGELOG') == null || System.getenv('CHANGELOG').equals('none') ? '' : System.getenv('CHANGELOG')
         changelogType = 'html'
         releaseType = project.release_type
-		addGameVersion '1.15.2'
+		addGameVersion '1.16.1'
         mainArtifact(jar) {
             displayName = archivesBaseName + " - ${version}"
         }

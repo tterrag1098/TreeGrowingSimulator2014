@@ -46,7 +46,7 @@ public class TickHandlerTGS
 			PlayerEntity player = (PlayerEntity) event.player;
 			if (player.getEntityWorld().getGameTime() % 5 == 0)
 			{
-				List<BlockPos> coords = getNearestBlocks(player.getEntityWorld(), new BlockPos(player));
+				List<BlockPos> coords = getNearestBlocks(player.getEntityWorld(), new BlockPos(player.getPositionVec()));
 
 				if (coords.size() == 0)
 				{
