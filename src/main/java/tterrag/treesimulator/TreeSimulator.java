@@ -21,7 +21,7 @@ public class TreeSimulator {
 
         ServerConfigs(ForgeConfigSpec.Builder builder) {
             waitTime = builder.comment("The amount of ticks (times 5) you must be crouching or sprinting before bonemeal is applied.")
-                    .defineInRange("waitTime", 25, 1, 1_000_000);
+                    .defineInRange("waitTime", 20, 1, 1_000_000);
         }
     }
 
