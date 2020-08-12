@@ -58,7 +58,7 @@ public class MessagePlayerParticle extends MessageBonemealParticles {
                         player.getPosY() + (world.rand.nextGaussian() * 0.75) + 0.8,
                         player.getPosZ() + (world.rand.nextGaussian() * 0.25)
                     );
-                Vector3d endPos = new Vector3d(pos.getX(), pos.getY(), pos.getZ()).add((world.rand.nextGaussian() * 0.3) + 0.5, (world.rand.nextGaussian() * 0.25) + 0.3, (world.rand.nextGaussian() * 0.3) + 0.5);
+                Vector3d endPos = Vector3d.copyCentered(pos).add(world.rand.nextGaussian() * 0.3, (world.rand.nextGaussian() * 0.25) - 0.2, world.rand.nextGaussian() * 0.3);
 
                 Vector3d vel = spawnPos.subtract(endPos).scale(-0.04);
                 
